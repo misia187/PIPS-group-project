@@ -7,6 +7,7 @@ date: "2026-10-16"
 ```{r}
 clindata <- read.csv("/Users/tessgilmartin/Desktop/UVA RESMAS/PIPS/r_course/final_project/PIPS-group-project/mentalillness.csv")
 str(clindata)
+lol
 ```
 
 ## R Markdown
