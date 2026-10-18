@@ -34,6 +34,33 @@ clindata <- load_mental_illness("data/Mentalillness.csv", variable_key)
 knitr::kable(head(variable_key, 10))
 ```
 
+## DSM rules
+
+The diagnoses in the dataset follow fixed counting rules. Here we rebuild
+all five diagnoses from the symptom columns and check that they match the
+diagnoses in the data.
+
+```{r dsm-rules}
+source("src/r/dsm_rules.R")
+
+clindata <- apply_dsm_rules(clindata, variable_key)
+rule_check <- verify_dsm_rules(clindata)
+knitr::kable(rule_check)
+```
+
+### Tests
+
+To check that the rules work at the cutoffs, we test them on made-up
+participants whose diagnosis we know in advance.
+
+```{r dsm-tests}
+source("src/r/test_dsm_rules.R")
+
+test_results <- test_dsm_rules(clindata, variable_key)
+knitr::kable(test_results)
+```
+
+
 # Dataset overview
 
 ```{r data-overview}

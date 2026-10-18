@@ -463,11 +463,128 @@ for painful consequences</td>
 </tr>
 </tbody>
 </table>
+<div id="dsm-rules" class="section level2">
+<h2>DSM rules</h2>
+<p>The diagnoses in the dataset follow fixed counting rules. Here we
+rebuild all five diagnoses from the symptom columns and check that they
+match the diagnoses in the data.</p>
+<pre class="r"><code>source(&quot;src/r/dsm_rules.R&quot;)
+
+clindata &lt;- apply_dsm_rules(clindata, variable_key)
+rule_check &lt;- verify_dsm_rules(clindata)</code></pre>
+<pre><code>## All five diagnoses are reproduced exactly (3753 of 3753 rows).</code></pre>
+<pre class="r"><code>knitr::kable(rule_check)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">disorder</th>
+<th align="right">n_observed</th>
+<th align="right">n_rebuilt</th>
+<th align="right">n_match</th>
+<th align="right">percent_match</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">bipolar</td>
+<td align="right">2909</td>
+<td align="right">2909</td>
+<td align="right">3753</td>
+<td align="right">100</td>
+</tr>
+<tr class="even">
+<td align="left">depression</td>
+<td align="right">1845</td>
+<td align="right">1845</td>
+<td align="right">3753</td>
+<td align="right">100</td>
+</tr>
+<tr class="odd">
+<td align="left">anxiety</td>
+<td align="right">1622</td>
+<td align="right">1622</td>
+<td align="right">3753</td>
+<td align="right">100</td>
+</tr>
+<tr class="even">
+<td align="left">schizophrenia</td>
+<td align="right">3167</td>
+<td align="right">3167</td>
+<td align="right">3753</td>
+<td align="right">100</td>
+</tr>
+<tr class="odd">
+<td align="left">ptsd</td>
+<td align="right">203</td>
+<td align="right">203</td>
+<td align="right">3753</td>
+<td align="right">100</td>
+</tr>
+</tbody>
+</table>
+<div id="tests" class="section level3">
+<h3>Tests</h3>
+<p>To check that the rules work at the cutoffs, we test them on made-up
+participants whose diagnosis we know in advance.</p>
+<pre class="r"><code>source(&quot;src/r/test_dsm_rules.R&quot;)
+
+test_results &lt;- test_dsm_rules(clindata, variable_key)</code></pre>
+<pre><code>## PASS: Bipolar: 3 symptoms = yes, 2 = no</code></pre>
+<pre><code>## PASS: Depression: 5 symptoms = yes, 4 = no</code></pre>
+<pre><code>## PASS: Anxiety: needs 2 symptoms AND duration</code></pre>
+<pre><code>## PASS: Schizophrenia: positive symptom needed, 2 items in total</code></pre>
+<pre><code>## PASS: PTSD: all minimums = yes, missing G or 1 D item = no</code></pre>
+<pre><code>## PASS: Thresholds: bipolar cutoff 2 diagnoses someone with 2 symptoms</code></pre>
+<pre><code>## All 6 tests passed.</code></pre>
+<pre class="r"><code>knitr::kable(test_results)</code></pre>
+<table>
+<colgroup>
+<col width="90%" />
+<col width="10%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">test</th>
+<th align="left">passed</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Bipolar: 3 symptoms = yes, 2 = no</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="even">
+<td align="left">Depression: 5 symptoms = yes, 4 = no</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="odd">
+<td align="left">Anxiety: needs 2 symptoms AND duration</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="even">
+<td align="left">Schizophrenia: positive symptom needed, 2 items in
+total</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="odd">
+<td align="left">PTSD: all minimums = yes, missing G or 1 D item =
+no</td>
+<td align="left">TRUE</td>
+</tr>
+<tr class="even">
+<td align="left">Thresholds: bipolar cutoff 2 diagnoses someone with 2
+symptoms</td>
+<td align="left">TRUE</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </div>
 <div id="dataset-overview" class="section level1">
 <h1>Dataset overview</h1>
 <pre class="r"><code>dim(clindata)</code></pre>
-<pre><code>## [1] 3753   59</code></pre>
+<pre><code>## [1] 3753   74</code></pre>
 <pre class="r"><code>names(clindata)</code></pre>
 <pre><code>##  [1] &quot;id&quot;                            &quot;bip_inflated_self_esteem&quot;     
 ##  [3] &quot;bip_distractibility&quot;           &quot;bip_goal_directed_activity&quot;   
@@ -498,7 +615,14 @@ for painful consequences</td>
 ## [53] &quot;ptsd_not_substance_induced&quot;    &quot;ptsd_intrusive_memories&quot;      
 ## [55] &quot;dx_bipolar&quot;                    &quot;dx_schizophrenia&quot;             
 ## [57] &quot;dx_depression&quot;                 &quot;dx_anxiety&quot;                   
-## [59] &quot;dx_ptsd&quot;</code></pre>
+## [59] &quot;dx_ptsd&quot;                       &quot;n_bipolar&quot;                    
+## [61] &quot;n_depression&quot;                  &quot;n_anxiety&quot;                    
+## [63] &quot;n_scz_positive&quot;                &quot;n_scz_total&quot;                  
+## [65] &quot;n_ptsd_A&quot;                      &quot;n_ptsd_B&quot;                     
+## [67] &quot;n_ptsd_C&quot;                      &quot;n_ptsd_D&quot;                     
+## [69] &quot;n_ptsd_E&quot;                      &quot;rule_bipolar&quot;                 
+## [71] &quot;rule_depression&quot;               &quot;rule_anxiety&quot;                 
+## [73] &quot;rule_schizophrenia&quot;            &quot;rule_ptsd&quot;</code></pre>
 <pre class="r"><code>summary(clindata)</code></pre>
 <pre><code>##        id       bip_inflated_self_esteem bip_distractibility
 ##  Min.   :   1   Min.   :0.0000           Min.   :0.0000     
@@ -625,7 +749,35 @@ for painful consequences</td>
 ##  Median :1.0000   Median :0.0000   Median :0.0000   Median :0.00000  
 ##  Mean   :0.8439   Mean   :0.4916   Mean   :0.4322   Mean   :0.05409  
 ##  3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:0.00000  
-##  Max.   :1.0000   Max.   :1.0000   Max.   :1.0000   Max.   :1.00000</code></pre>
+##  Max.   :1.0000   Max.   :1.0000   Max.   :1.0000   Max.   :1.00000  
+##    n_bipolar      n_depression     n_anxiety     n_scz_positive 
+##  Min.   :0.000   Min.   :0.000   Min.   :0.000   Min.   :0.000  
+##  1st Qu.:3.000   1st Qu.:3.000   1st Qu.:2.000   1st Qu.:1.000  
+##  Median :3.000   Median :4.000   Median :3.000   Median :2.000  
+##  Mean   :3.502   Mean   :4.477   Mean   :2.998   Mean   :1.515  
+##  3rd Qu.:4.000   3rd Qu.:6.000   3rd Qu.:4.000   3rd Qu.:2.000  
+##  Max.   :7.000   Max.   :9.000   Max.   :6.000   Max.   :3.000  
+##   n_scz_total       n_ptsd_A         n_ptsd_B        n_ptsd_C     
+##  Min.   :0.000   Min.   :0.0000   Min.   :0.000   Min.   :0.0000  
+##  1st Qu.:3.000   1st Qu.:0.0000   1st Qu.:1.000   1st Qu.:0.0000  
+##  Median :4.000   Median :1.0000   Median :2.000   Median :1.0000  
+##  Mean   :3.522   Mean   :0.9904   Mean   :1.997   Mean   :0.9755  
+##  3rd Qu.:4.000   3rd Qu.:2.0000   3rd Qu.:3.000   3rd Qu.:1.0000  
+##  Max.   :7.000   Max.   :2.0000   Max.   :4.000   Max.   :2.0000  
+##     n_ptsd_D       n_ptsd_E      rule_bipolar    rule_depression 
+##  Min.   :0.00   Min.   :0.000   Min.   :0.0000   Min.   :0.0000  
+##  1st Qu.:2.00   1st Qu.:2.000   1st Qu.:1.0000   1st Qu.:0.0000  
+##  Median :3.00   Median :3.000   Median :1.0000   Median :0.0000  
+##  Mean   :2.97   Mean   :2.993   Mean   :0.7751   Mean   :0.4916  
+##  3rd Qu.:4.00   3rd Qu.:4.000   3rd Qu.:1.0000   3rd Qu.:1.0000  
+##  Max.   :6.00   Max.   :6.000   Max.   :1.0000   Max.   :1.0000  
+##   rule_anxiety    rule_schizophrenia   rule_ptsd      
+##  Min.   :0.0000   Min.   :0.0000     Min.   :0.00000  
+##  1st Qu.:0.0000   1st Qu.:1.0000     1st Qu.:0.00000  
+##  Median :0.0000   Median :1.0000     Median :0.00000  
+##  Mean   :0.4322   Mean   :0.8439     Mean   :0.05409  
+##  3rd Qu.:1.0000   3rd Qu.:1.0000     3rd Qu.:0.00000  
+##  Max.   :1.0000   Max.   :1.0000     Max.   :1.00000</code></pre>
 </div>
 <div id="interactive-component" class="section level1">
 <h1>Interactive component</h1>
