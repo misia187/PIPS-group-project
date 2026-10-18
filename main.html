@@ -365,440 +365,267 @@ component.</p>
 </div>
 <div id="dataset" class="section level1">
 <h1>Dataset</h1>
-<p>The dataset used in this project is stored in the <code>data</code>
-folder.</p>
-<pre class="r"><code>clindata &lt;- read.csv(&quot;data/Mentalillness.csv&quot;)
-head(clindata)</code></pre>
-<pre><code>##   ID Inflated.self.esteem Distractibility Increase.in.goal.directed.activity
-## 1  1                    0               1                                  1
-## 2  2                    0               1                                  0
-## 3  3                    1               0                                  1
-## 4  4                    0               0                                  1
-## 5  5                    1               1                                  0
-## 6  6                    0               1                                  0
-##   Excessive.involvement.in.activities.with.high.potential.for.painful.consequences
-## 1                                                                                0
-## 2                                                                                0
-## 3                                                                                0
-## 4                                                                                0
-## 5                                                                                0
-## 6                                                                                0
-##   Racing.thoughts Decreased.need.for.sleep More.talkative.than.usual
-## 1               1                        1                         0
-## 2               1                        1                         1
-## 3               0                        0                         0
-## 4               0                        1                         1
-## 5               1                        1                         1
-## 6               0                        0                         1
-##   Disorganized.thinking.or.speech Intrusive.memories.or.flashbacks
-## 1                               0                                1
-## 2                               0                                0
-## 3                               1                                0
-## 4                               0                                1
-## 5                               0                                0
-## 6                               0                                1
-##   Diminished.emotional.expression Delusions Hallucinations Catatonic.behavior
-## 1                               0         0              1                  1
-## 2                               1         1              1                  0
-## 3                               0         0              0                  0
-## 4                               1         0              0                  0
-## 5                               1         1              1                  1
-## 6                               0         0              1                  1
-##   X1.month.duration Depressed.mood Persistent.sadness.or.low.mood
-## 1                 1              0                              1
-## 2                 1              0                              0
-## 3                 1              0                              0
-## 4                 1              0                              1
-## 5                 0              0                              1
-## 6                 0              0                              0
-##   Loss.of.interest.or.pleasure.in.activities Fatigue.or.loss.of.energy
-## 1                                          1                         1
-## 2                                          0                         0
-## 3                                          1                         1
-## 4                                          0                         0
-## 5                                          1                         0
-## 6                                          0                         0
-##   Difficulty.concentrating.or.making.decisions Lack.of.sleep.or.oversleeping
-## 1                                            1                             1
-## 2                                            1                             1
-## 3                                            1                             1
-## 4                                            0                             0
-## 5                                            0                             1
-## 6                                            0                             1
-##   Psychomotor.agitation Thoughts.of.suicide Weight.loss.or.gain
-## 1                     1                   1                   1
-## 2                     1                   0                   1
-## 3                     1                   0                   1
-## 4                     0                   1                   1
-## 5                     0                   1                   0
-## 6                     0                   1                   0
-##   Excessive.worry.or.fear Fatigue Sleep.disturbance Difficulty.concentrating
-## 1                       0       0                 1                        1
-## 2                       0       1                 0                        1
-## 3                       0       0                 0                        0
-## 4                       1       0                 1                        0
-## 5                       1       0                 1                        1
-## 6                       1       1                 0                        1
-##   Restlessness Irritability X6.month.duration Experiencing.traumatic.event
-## 1            1            0                 1                            1
-## 2            1            0                 0                            1
-## 3            0            0                 0                            1
-## 4            0            0                 0                            1
-## 5            0            0                 1                            0
-## 6            1            1                 0                            0
-##   Witnessing.traumatic.event Dissociative.reaction
-## 1                          0                     1
-## 2                          1                     1
-## 3                          1                     1
-## 4                          0                     1
-## 5                          0                     1
-## 6                          0                     0
-##   Recurrent.distressing.dreaming.affiliated.with.the.traumatic.event
-## 1                                                                  1
-## 2                                                                  1
-## 3                                                                  0
-## 4                                                                  1
-## 5                                                                  1
-## 6                                                                  0
-##   Intense.distress.or.reaction.when.exposed.to.cues.affiliated.with.the.traumatic.event
-## 1                                                                                     1
-## 2                                                                                     0
-## 3                                                                                     1
-## 4                                                                                     0
-## 5                                                                                     0
-## 6                                                                                     0
-##   Avoidance.of.reminders.of.traumatic.event
-## 1                                         1
-## 2                                         0
-## 3                                         0
-## 4                                         1
-## 5                                         1
-## 6                                         0
-##   Avoidance.of.external.reminders.of.traumatic.event
-## 1                                                  1
-## 2                                                  1
-## 3                                                  1
-## 4                                                  1
-## 5                                                  1
-## 6                                                  1
-##   Persistent.and.exaggerated.negative.belief.about.oneself.or.the.world
-## 1                                                                     1
-## 2                                                                     0
-## 3                                                                     1
-## 4                                                                     0
-## 5                                                                     1
-## 6                                                                     1
-##   Persistent.loss.of.memory.about.the.cause.or.consequences.of.the.traumatic.event
-## 1                                                                                0
-## 2                                                                                0
-## 3                                                                                1
-## 4                                                                                0
-## 5                                                                                0
-## 6                                                                                0
-##   Persistent.negative.emotional.state Diminished.interest Feeling.of.detachment
-## 1                                   0                   0                     1
-## 2                                   0                   0                     1
-## 3                                   0                   0                     0
-## 4                                   1                   0                     1
-## 5                                   1                   0                     0
-## 6                                   0                   1                     1
-##   Persistent.inability.to.experience.positive.emotions Angry.outburst
-## 1                                                    1              0
-## 2                                                    0              0
-## 3                                                    1              1
-## 4                                                    1              1
-## 5                                                    0              0
-## 6                                                    1              0
-##   Recklessness Hypervigilance Exaggerated.startle.response Concentration.issues
-## 1            0              1                            1                    0
-## 2            0              0                            0                    0
-## 3            1              1                            1                    1
-## 4            0              0                            1                    1
-## 5            0              0                            1                    0
-## 6            0              1                            0                    0
-##   Sleep.disturbance.1 More.than.one.month.of.disturbance
-## 1                   1                                  0
-## 2                   1                                  1
-## 3                   1                                  1
-## 4                   0                                  0
-## 5                   0                                  1
-## 6                   0                                  0
-##   The.disturbance.causes.clinically.significant.distress
-## 1                                                      0
-## 2                                                      0
-## 3                                                      1
-## 4                                                      1
-## 5                                                      0
-## 6                                                      1
-##   The.disturbance.is.not.substance.induced Intrusive.memories.or.flashback
-## 1                                        0                               0
-## 2                                        0                               1
-## 3                                        1                               1
-## 4                                        1                               1
-## 5                                        1                               0
-## 6                                        1                               0
-##   Bipolar.disorder Schizophrenia Depression Anxiety.disorder PTSD
-## 1                1             1          1                1    0
-## 2                1             1          0                0    0
-## 3                0             1          1                0    1
-## 4                1             0          0                0    0
-## 5                1             1          0                1    0
-## 6                0             1          0                0    0</code></pre>
+<p>The dataset (Mentalillness.csv, Kaggle) contains 3,753 synthetic
+participants with 53 binary DSM-5 symptoms and criteria (0 = absent, 1 =
+present) and 5 binary diagnoses: bipolar disorder, schizophrenia,
+depression, anxiety disorder, and PTSD. It is stored in the
+<code>data</code> folder.</p>
+<p>Because the original column names are long, we first build a variable
+key that gives each column a short name and records which disorder and
+DSM-5 criterion it belongs to. The key is saved as
+<code>data/variable_key.csv</code>. We then load the data with these
+short names and check that every value is 0 or 1.</p>
+<pre class="r"><code>source(&quot;src/r/functions.R&quot;)
+source(&quot;src/r/variable_key.R&quot;)
+
+variable_key &lt;- make_variable_key()
+save_variable_key(variable_key, &quot;data/variable_key.csv&quot;)</code></pre>
+<pre><code>## Variable key saved to data/variable_key.csv</code></pre>
+<pre class="r"><code>clindata &lt;- load_mental_illness(&quot;data/Mentalillness.csv&quot;, variable_key)</code></pre>
+<pre><code>## Check passed: all 58 columns contain only 0 and 1.</code></pre>
+<pre class="r"><code>knitr::kable(head(variable_key, 10))</code></pre>
+<table>
+<colgroup>
+<col width="61%" />
+<col width="20%" />
+<col width="10%" />
+<col width="7%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">original</th>
+<th align="left">name</th>
+<th align="left">disorder</th>
+<th align="left">criterion</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">Inflated self-esteem</td>
+<td align="left">bip_inflated_self_esteem</td>
+<td align="left">bipolar</td>
+<td align="left">symptom</td>
+</tr>
+<tr class="even">
+<td align="left">Distractibility</td>
+<td align="left">bip_distractibility</td>
+<td align="left">bipolar</td>
+<td align="left">symptom</td>
+</tr>
+<tr class="odd">
+<td align="left">Increase in goal-directed activity</td>
+<td align="left">bip_goal_directed_activity</td>
+<td align="left">bipolar</td>
+<td align="left">symptom</td>
+</tr>
+<tr class="even">
+<td align="left">Excessive involvement in activities with high potential
+for painful consequences</td>
+<td align="left">bip_risky_activities</td>
+<td align="left">bipolar</td>
+<td align="left">symptom</td>
+</tr>
+<tr class="odd">
+<td align="left">Racing thoughts</td>
+<td align="left">bip_racing_thoughts</td>
+<td align="left">bipolar</td>
+<td align="left">symptom</td>
+</tr>
+<tr class="even">
+<td align="left">Decreased need for sleep</td>
+<td align="left">bip_decreased_sleep_need</td>
+<td align="left">bipolar</td>
+<td align="left">symptom</td>
+</tr>
+<tr class="odd">
+<td align="left">More talkative than usual</td>
+<td align="left">bip_talkative</td>
+<td align="left">bipolar</td>
+<td align="left">symptom</td>
+</tr>
+<tr class="even">
+<td align="left">Disorganized thinking or speech</td>
+<td align="left">scz_disorganized_speech</td>
+<td align="left">schizophrenia</td>
+<td align="left">positive</td>
+</tr>
+<tr class="odd">
+<td align="left">Intrusive memories or flashbacks</td>
+<td align="left">scz_intrusive_memories</td>
+<td align="left">schizophrenia</td>
+<td align="left">other</td>
+</tr>
+<tr class="even">
+<td align="left">Diminished emotional expression</td>
+<td align="left">scz_diminished_expression</td>
+<td align="left">schizophrenia</td>
+<td align="left">other</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div id="dataset-overview" class="section level1">
 <h1>Dataset overview</h1>
 <pre class="r"><code>dim(clindata)</code></pre>
 <pre><code>## [1] 3753   59</code></pre>
 <pre class="r"><code>names(clindata)</code></pre>
-<pre><code>##  [1] &quot;ID&quot;                                                                                   
-##  [2] &quot;Inflated.self.esteem&quot;                                                                 
-##  [3] &quot;Distractibility&quot;                                                                      
-##  [4] &quot;Increase.in.goal.directed.activity&quot;                                                   
-##  [5] &quot;Excessive.involvement.in.activities.with.high.potential.for.painful.consequences&quot;     
-##  [6] &quot;Racing.thoughts&quot;                                                                      
-##  [7] &quot;Decreased.need.for.sleep&quot;                                                             
-##  [8] &quot;More.talkative.than.usual&quot;                                                            
-##  [9] &quot;Disorganized.thinking.or.speech&quot;                                                      
-## [10] &quot;Intrusive.memories.or.flashbacks&quot;                                                     
-## [11] &quot;Diminished.emotional.expression&quot;                                                      
-## [12] &quot;Delusions&quot;                                                                            
-## [13] &quot;Hallucinations&quot;                                                                       
-## [14] &quot;Catatonic.behavior&quot;                                                                   
-## [15] &quot;X1.month.duration&quot;                                                                    
-## [16] &quot;Depressed.mood&quot;                                                                       
-## [17] &quot;Persistent.sadness.or.low.mood&quot;                                                       
-## [18] &quot;Loss.of.interest.or.pleasure.in.activities&quot;                                           
-## [19] &quot;Fatigue.or.loss.of.energy&quot;                                                            
-## [20] &quot;Difficulty.concentrating.or.making.decisions&quot;                                         
-## [21] &quot;Lack.of.sleep.or.oversleeping&quot;                                                        
-## [22] &quot;Psychomotor.agitation&quot;                                                                
-## [23] &quot;Thoughts.of.suicide&quot;                                                                  
-## [24] &quot;Weight.loss.or.gain&quot;                                                                  
-## [25] &quot;Excessive.worry.or.fear&quot;                                                              
-## [26] &quot;Fatigue&quot;                                                                              
-## [27] &quot;Sleep.disturbance&quot;                                                                    
-## [28] &quot;Difficulty.concentrating&quot;                                                             
-## [29] &quot;Restlessness&quot;                                                                         
-## [30] &quot;Irritability&quot;                                                                         
-## [31] &quot;X6.month.duration&quot;                                                                    
-## [32] &quot;Experiencing.traumatic.event&quot;                                                         
-## [33] &quot;Witnessing.traumatic.event&quot;                                                           
-## [34] &quot;Dissociative.reaction&quot;                                                                
-## [35] &quot;Recurrent.distressing.dreaming.affiliated.with.the.traumatic.event&quot;                   
-## [36] &quot;Intense.distress.or.reaction.when.exposed.to.cues.affiliated.with.the.traumatic.event&quot;
-## [37] &quot;Avoidance.of.reminders.of.traumatic.event&quot;                                            
-## [38] &quot;Avoidance.of.external.reminders.of.traumatic.event&quot;                                   
-## [39] &quot;Persistent.and.exaggerated.negative.belief.about.oneself.or.the.world&quot;                
-## [40] &quot;Persistent.loss.of.memory.about.the.cause.or.consequences.of.the.traumatic.event&quot;     
-## [41] &quot;Persistent.negative.emotional.state&quot;                                                  
-## [42] &quot;Diminished.interest&quot;                                                                  
-## [43] &quot;Feeling.of.detachment&quot;                                                                
-## [44] &quot;Persistent.inability.to.experience.positive.emotions&quot;                                 
-## [45] &quot;Angry.outburst&quot;                                                                       
-## [46] &quot;Recklessness&quot;                                                                         
-## [47] &quot;Hypervigilance&quot;                                                                       
-## [48] &quot;Exaggerated.startle.response&quot;                                                         
-## [49] &quot;Concentration.issues&quot;                                                                 
-## [50] &quot;Sleep.disturbance.1&quot;                                                                  
-## [51] &quot;More.than.one.month.of.disturbance&quot;                                                   
-## [52] &quot;The.disturbance.causes.clinically.significant.distress&quot;                               
-## [53] &quot;The.disturbance.is.not.substance.induced&quot;                                             
-## [54] &quot;Intrusive.memories.or.flashback&quot;                                                      
-## [55] &quot;Bipolar.disorder&quot;                                                                     
-## [56] &quot;Schizophrenia&quot;                                                                        
-## [57] &quot;Depression&quot;                                                                           
-## [58] &quot;Anxiety.disorder&quot;                                                                     
-## [59] &quot;PTSD&quot;</code></pre>
+<pre><code>##  [1] &quot;id&quot;                            &quot;bip_inflated_self_esteem&quot;     
+##  [3] &quot;bip_distractibility&quot;           &quot;bip_goal_directed_activity&quot;   
+##  [5] &quot;bip_risky_activities&quot;          &quot;bip_racing_thoughts&quot;          
+##  [7] &quot;bip_decreased_sleep_need&quot;      &quot;bip_talkative&quot;                
+##  [9] &quot;scz_disorganized_speech&quot;       &quot;scz_intrusive_memories&quot;       
+## [11] &quot;scz_diminished_expression&quot;     &quot;scz_delusions&quot;                
+## [13] &quot;scz_hallucinations&quot;            &quot;scz_catatonic_behavior&quot;       
+## [15] &quot;scz_duration_1_month&quot;          &quot;dep_depressed_mood&quot;           
+## [17] &quot;dep_persistent_sadness&quot;        &quot;dep_loss_of_interest&quot;         
+## [19] &quot;dep_fatigue&quot;                   &quot;dep_concentration&quot;            
+## [21] &quot;dep_sleep_change&quot;              &quot;dep_psychomotor_agitation&quot;    
+## [23] &quot;dep_suicidal_thoughts&quot;         &quot;dep_weight_change&quot;            
+## [25] &quot;anx_excessive_worry&quot;           &quot;anx_fatigue&quot;                  
+## [27] &quot;anx_sleep_disturbance&quot;         &quot;anx_concentration&quot;            
+## [29] &quot;anx_restlessness&quot;              &quot;anx_irritability&quot;             
+## [31] &quot;anx_duration_6_months&quot;         &quot;ptsd_experienced_trauma&quot;      
+## [33] &quot;ptsd_witnessed_trauma&quot;         &quot;ptsd_dissociative_reaction&quot;   
+## [35] &quot;ptsd_distressing_dreams&quot;       &quot;ptsd_distress_at_cues&quot;        
+## [37] &quot;ptsd_avoid_reminders&quot;          &quot;ptsd_avoid_external_reminders&quot;
+## [39] &quot;ptsd_negative_beliefs&quot;         &quot;ptsd_memory_loss&quot;             
+## [41] &quot;ptsd_negative_emotional_state&quot; &quot;ptsd_diminished_interest&quot;     
+## [43] &quot;ptsd_detachment&quot;               &quot;ptsd_no_positive_emotions&quot;    
+## [45] &quot;ptsd_angry_outbursts&quot;          &quot;ptsd_recklessness&quot;            
+## [47] &quot;ptsd_hypervigilance&quot;           &quot;ptsd_startle_response&quot;        
+## [49] &quot;ptsd_concentration&quot;            &quot;ptsd_sleep_disturbance&quot;       
+## [51] &quot;ptsd_duration_1_month&quot;         &quot;ptsd_clinical_distress&quot;       
+## [53] &quot;ptsd_not_substance_induced&quot;    &quot;ptsd_intrusive_memories&quot;      
+## [55] &quot;dx_bipolar&quot;                    &quot;dx_schizophrenia&quot;             
+## [57] &quot;dx_depression&quot;                 &quot;dx_anxiety&quot;                   
+## [59] &quot;dx_ptsd&quot;</code></pre>
 <pre class="r"><code>summary(clindata)</code></pre>
-<pre><code>##        ID       Inflated.self.esteem Distractibility 
-##  Min.   :   1   Min.   :0.0000       Min.   :0.0000  
-##  1st Qu.: 939   1st Qu.:0.0000       1st Qu.:0.0000  
-##  Median :1877   Median :1.0000       Median :0.0000  
-##  Mean   :1877   Mean   :0.5175       Mean   :0.4943  
-##  3rd Qu.:2815   3rd Qu.:1.0000       3rd Qu.:1.0000  
-##  Max.   :3753   Max.   :1.0000       Max.   :1.0000  
-##  Increase.in.goal.directed.activity
-##  Min.   :0.0000                    
-##  1st Qu.:0.0000                    
-##  Median :1.0000                    
-##  Mean   :0.5012                    
-##  3rd Qu.:1.0000                    
-##  Max.   :1.0000                    
-##  Excessive.involvement.in.activities.with.high.potential.for.painful.consequences
-##  Min.   :0.00                                                                    
-##  1st Qu.:0.00                                                                    
-##  Median :0.00                                                                    
-##  Mean   :0.49                                                                    
-##  3rd Qu.:1.00                                                                    
-##  Max.   :1.00                                                                    
-##  Racing.thoughts  Decreased.need.for.sleep More.talkative.than.usual
-##  Min.   :0.0000   Min.   :0.0000           Min.   :0.0000           
-##  1st Qu.:0.0000   1st Qu.:0.0000           1st Qu.:0.0000           
-##  Median :0.0000   Median :1.0000           Median :0.0000           
-##  Mean   :0.4929   Mean   :0.5121           Mean   :0.4943           
-##  3rd Qu.:1.0000   3rd Qu.:1.0000           3rd Qu.:1.0000           
-##  Max.   :1.0000   Max.   :1.0000           Max.   :1.0000           
-##  Disorganized.thinking.or.speech Intrusive.memories.or.flashbacks
-##  Min.   :0.0000                  Min.   :0.000                   
-##  1st Qu.:0.0000                  1st Qu.:0.000                   
-##  Median :1.0000                  Median :0.000                   
-##  Mean   :0.5047                  Mean   :0.486                   
-##  3rd Qu.:1.0000                  3rd Qu.:1.000                   
-##  Max.   :1.0000                  Max.   :1.000                   
-##  Diminished.emotional.expression   Delusions      Hallucinations  
-##  Min.   :0.0000                  Min.   :0.0000   Min.   :0.0000  
-##  1st Qu.:0.0000                  1st Qu.:0.0000   1st Qu.:0.0000  
-##  Median :0.0000                  Median :1.0000   Median :0.0000  
-##  Mean   :0.4988                  Mean   :0.5111   Mean   :0.4991  
-##  3rd Qu.:1.0000                  3rd Qu.:1.0000   3rd Qu.:1.0000  
-##  Max.   :1.0000                  Max.   :1.0000   Max.   :1.0000  
-##  Catatonic.behavior X1.month.duration Depressed.mood  
-##  Min.   :0.0000     Min.   :0.0000    Min.   :0.0000  
-##  1st Qu.:0.0000     1st Qu.:0.0000    1st Qu.:0.0000  
-##  Median :1.0000     Median :1.0000    Median :0.0000  
-##  Mean   :0.5135     Mean   :0.5087    Mean   :0.4879  
-##  3rd Qu.:1.0000     3rd Qu.:1.0000    3rd Qu.:1.0000  
-##  Max.   :1.0000     Max.   :1.0000    Max.   :1.0000  
-##  Persistent.sadness.or.low.mood Loss.of.interest.or.pleasure.in.activities
-##  Min.   :0.0000                 Min.   :0.0000                            
-##  1st Qu.:0.0000                 1st Qu.:0.0000                            
-##  Median :0.0000                 Median :0.0000                            
-##  Mean   :0.4983                 Mean   :0.4953                            
-##  3rd Qu.:1.0000                 3rd Qu.:1.0000                            
-##  Max.   :1.0000                 Max.   :1.0000                            
-##  Fatigue.or.loss.of.energy Difficulty.concentrating.or.making.decisions
-##  Min.   :0.0000            Min.   :0.0000                              
-##  1st Qu.:0.0000            1st Qu.:0.0000                              
-##  Median :1.0000            Median :0.0000                              
-##  Mean   :0.5009            Mean   :0.4927                              
-##  3rd Qu.:1.0000            3rd Qu.:1.0000                              
-##  Max.   :1.0000            Max.   :1.0000                              
-##  Lack.of.sleep.or.oversleeping Psychomotor.agitation Thoughts.of.suicide
-##  Min.   :0.0000                Min.   :0.0000        Min.   :0.0000     
-##  1st Qu.:0.0000                1st Qu.:0.0000        1st Qu.:0.0000     
-##  Median :0.0000                Median :1.0000        Median :1.0000     
-##  Mean   :0.4996                Mean   :0.5076        Mean   :0.5041     
-##  3rd Qu.:1.0000                3rd Qu.:1.0000        3rd Qu.:1.0000     
-##  Max.   :1.0000                Max.   :1.0000        Max.   :1.0000     
-##  Weight.loss.or.gain Excessive.worry.or.fear    Fatigue       Sleep.disturbance
-##  Min.   :0.0000      Min.   :0.0000          Min.   :0.0000   Min.   :0.0000   
-##  1st Qu.:0.0000      1st Qu.:0.0000          1st Qu.:0.0000   1st Qu.:0.0000   
-##  Median :0.0000      Median :0.0000          Median :1.0000   Median :0.0000   
-##  Mean   :0.4908      Mean   :0.4916          Mean   :0.5004   Mean   :0.4991   
-##  3rd Qu.:1.0000      3rd Qu.:1.0000          3rd Qu.:1.0000   3rd Qu.:1.0000   
-##  Max.   :1.0000      Max.   :1.0000          Max.   :1.0000   Max.   :1.0000   
-##  Difficulty.concentrating  Restlessness     Irritability    X6.month.duration
-##  Min.   :0.0000           Min.   :0.0000   Min.   :0.0000   Min.   :0.0000   
-##  1st Qu.:0.0000           1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.0000   
-##  Median :1.0000           Median :0.0000   Median :1.0000   Median :0.0000   
-##  Mean   :0.5081           Mean   :0.4929   Mean   :0.5057   Mean   :0.4871   
-##  3rd Qu.:1.0000           3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:1.0000   
-##  Max.   :1.0000           Max.   :1.0000   Max.   :1.0000   Max.   :1.0000   
-##  Experiencing.traumatic.event Witnessing.traumatic.event Dissociative.reaction
-##  Min.   :0.0000               Min.   :0.0000             Min.   :0.0000       
-##  1st Qu.:0.0000               1st Qu.:0.0000             1st Qu.:0.0000       
-##  Median :0.0000               Median :1.0000             Median :0.0000       
-##  Mean   :0.4857               Mean   :0.5047             Mean   :0.4945       
-##  3rd Qu.:1.0000               3rd Qu.:1.0000             3rd Qu.:1.0000       
-##  Max.   :1.0000               Max.   :1.0000             Max.   :1.0000       
-##  Recurrent.distressing.dreaming.affiliated.with.the.traumatic.event
-##  Min.   :0.0000                                                    
-##  1st Qu.:0.0000                                                    
-##  Median :1.0000                                                    
-##  Mean   :0.5012                                                    
-##  3rd Qu.:1.0000                                                    
-##  Max.   :1.0000                                                    
-##  Intense.distress.or.reaction.when.exposed.to.cues.affiliated.with.the.traumatic.event
-##  Min.   :0.0000                                                                       
-##  1st Qu.:0.0000                                                                       
-##  Median :1.0000                                                                       
-##  Mean   :0.5039                                                                       
-##  3rd Qu.:1.0000                                                                       
-##  Max.   :1.0000                                                                       
-##  Avoidance.of.reminders.of.traumatic.event
-##  Min.   :0.0000                           
-##  1st Qu.:0.0000                           
-##  Median :0.0000                           
-##  Mean   :0.4839                           
-##  3rd Qu.:1.0000                           
-##  Max.   :1.0000                           
-##  Avoidance.of.external.reminders.of.traumatic.event
-##  Min.   :0.0000                                    
-##  1st Qu.:0.0000                                    
-##  Median :0.0000                                    
-##  Mean   :0.4916                                    
-##  3rd Qu.:1.0000                                    
-##  Max.   :1.0000                                    
-##  Persistent.and.exaggerated.negative.belief.about.oneself.or.the.world
-##  Min.   :0.0000                                                       
-##  1st Qu.:0.0000                                                       
-##  Median :1.0000                                                       
-##  Mean   :0.5031                                                       
-##  3rd Qu.:1.0000                                                       
-##  Max.   :1.0000                                                       
-##  Persistent.loss.of.memory.about.the.cause.or.consequences.of.the.traumatic.event
-##  Min.   :0.0000                                                                  
-##  1st Qu.:0.0000                                                                  
-##  Median :0.0000                                                                  
-##  Mean   :0.4863                                                                  
-##  3rd Qu.:1.0000                                                                  
-##  Max.   :1.0000                                                                  
-##  Persistent.negative.emotional.state Diminished.interest Feeling.of.detachment
-##  Min.   :0.000                       Min.   :0.0000      Min.   :0.0000       
-##  1st Qu.:0.000                       1st Qu.:0.0000      1st Qu.:0.0000       
-##  Median :1.000                       Median :0.0000      Median :0.0000       
-##  Mean   :0.502                       Mean   :0.4903      Mean   :0.4871       
-##  3rd Qu.:1.000                       3rd Qu.:1.0000      3rd Qu.:1.0000       
-##  Max.   :1.000                       Max.   :1.0000      Max.   :1.0000       
-##  Persistent.inability.to.experience.positive.emotions Angry.outburst  
-##  Min.   :0.0000                                       Min.   :0.0000  
-##  1st Qu.:0.0000                                       1st Qu.:0.0000  
-##  Median :1.0000                                       Median :0.0000  
-##  Mean   :0.5009                                       Mean   :0.4919  
-##  3rd Qu.:1.0000                                       3rd Qu.:1.0000  
-##  Max.   :1.0000                                       Max.   :1.0000  
-##   Recklessness    Hypervigilance   Exaggerated.startle.response
-##  Min.   :0.0000   Min.   :0.0000   Min.   :0.0000              
-##  1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.0000              
-##  Median :1.0000   Median :0.0000   Median :0.0000              
-##  Mean   :0.5055   Mean   :0.4953   Mean   :0.4996              
-##  3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:1.0000              
-##  Max.   :1.0000   Max.   :1.0000   Max.   :1.0000              
-##  Concentration.issues Sleep.disturbance.1 More.than.one.month.of.disturbance
-##  Min.   :0.0000       Min.   :0.0000      Min.   :0.0000                    
-##  1st Qu.:0.0000       1st Qu.:0.0000      1st Qu.:0.0000                    
-##  Median :0.0000       Median :1.0000      Median :1.0000                    
-##  Mean   :0.4993       Mean   :0.5009      Mean   :0.5057                    
-##  3rd Qu.:1.0000       3rd Qu.:1.0000      3rd Qu.:1.0000                    
-##  Max.   :1.0000       Max.   :1.0000      Max.   :1.0000                    
-##  The.disturbance.causes.clinically.significant.distress
-##  Min.   :0.0000                                        
-##  1st Qu.:0.0000                                        
-##  Median :0.0000                                        
-##  Mean   :0.4815                                        
-##  3rd Qu.:1.0000                                        
-##  Max.   :1.0000                                        
-##  The.disturbance.is.not.substance.induced Intrusive.memories.or.flashback
-##  Min.   :0.0000                           Min.   :0.0000                 
-##  1st Qu.:0.0000                           1st Qu.:0.0000                 
-##  Median :0.0000                           Median :0.0000                 
-##  Mean   :0.4895                           Mean   :0.4972                 
-##  3rd Qu.:1.0000                           3rd Qu.:1.0000                 
-##  Max.   :1.0000                           Max.   :1.0000                 
-##  Bipolar.disorder Schizophrenia      Depression     Anxiety.disorder
-##  Min.   :0.0000   Min.   :0.0000   Min.   :0.0000   Min.   :0.0000  
-##  1st Qu.:1.0000   1st Qu.:1.0000   1st Qu.:0.0000   1st Qu.:0.0000  
-##  Median :1.0000   Median :1.0000   Median :0.0000   Median :0.0000  
-##  Mean   :0.7751   Mean   :0.8439   Mean   :0.4916   Mean   :0.4322  
-##  3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:1.0000  
-##  Max.   :1.0000   Max.   :1.0000   Max.   :1.0000   Max.   :1.0000  
-##       PTSD        
-##  Min.   :0.00000  
-##  1st Qu.:0.00000  
-##  Median :0.00000  
-##  Mean   :0.05409  
-##  3rd Qu.:0.00000  
-##  Max.   :1.00000</code></pre>
+<pre><code>##        id       bip_inflated_self_esteem bip_distractibility
+##  Min.   :   1   Min.   :0.0000           Min.   :0.0000     
+##  1st Qu.: 939   1st Qu.:0.0000           1st Qu.:0.0000     
+##  Median :1877   Median :1.0000           Median :0.0000     
+##  Mean   :1877   Mean   :0.5175           Mean   :0.4943     
+##  3rd Qu.:2815   3rd Qu.:1.0000           3rd Qu.:1.0000     
+##  Max.   :3753   Max.   :1.0000           Max.   :1.0000     
+##  bip_goal_directed_activity bip_risky_activities bip_racing_thoughts
+##  Min.   :0.0000             Min.   :0.00         Min.   :0.0000     
+##  1st Qu.:0.0000             1st Qu.:0.00         1st Qu.:0.0000     
+##  Median :1.0000             Median :0.00         Median :0.0000     
+##  Mean   :0.5012             Mean   :0.49         Mean   :0.4929     
+##  3rd Qu.:1.0000             3rd Qu.:1.00         3rd Qu.:1.0000     
+##  Max.   :1.0000             Max.   :1.00         Max.   :1.0000     
+##  bip_decreased_sleep_need bip_talkative    scz_disorganized_speech
+##  Min.   :0.0000           Min.   :0.0000   Min.   :0.0000         
+##  1st Qu.:0.0000           1st Qu.:0.0000   1st Qu.:0.0000         
+##  Median :1.0000           Median :0.0000   Median :1.0000         
+##  Mean   :0.5121           Mean   :0.4943   Mean   :0.5047         
+##  3rd Qu.:1.0000           3rd Qu.:1.0000   3rd Qu.:1.0000         
+##  Max.   :1.0000           Max.   :1.0000   Max.   :1.0000         
+##  scz_intrusive_memories scz_diminished_expression scz_delusions   
+##  Min.   :0.000          Min.   :0.0000            Min.   :0.0000  
+##  1st Qu.:0.000          1st Qu.:0.0000            1st Qu.:0.0000  
+##  Median :0.000          Median :0.0000            Median :1.0000  
+##  Mean   :0.486          Mean   :0.4988            Mean   :0.5111  
+##  3rd Qu.:1.000          3rd Qu.:1.0000            3rd Qu.:1.0000  
+##  Max.   :1.000          Max.   :1.0000            Max.   :1.0000  
+##  scz_hallucinations scz_catatonic_behavior scz_duration_1_month
+##  Min.   :0.0000     Min.   :0.0000         Min.   :0.0000      
+##  1st Qu.:0.0000     1st Qu.:0.0000         1st Qu.:0.0000      
+##  Median :0.0000     Median :1.0000         Median :1.0000      
+##  Mean   :0.4991     Mean   :0.5135         Mean   :0.5087      
+##  3rd Qu.:1.0000     3rd Qu.:1.0000         3rd Qu.:1.0000      
+##  Max.   :1.0000     Max.   :1.0000         Max.   :1.0000      
+##  dep_depressed_mood dep_persistent_sadness dep_loss_of_interest
+##  Min.   :0.0000     Min.   :0.0000         Min.   :0.0000      
+##  1st Qu.:0.0000     1st Qu.:0.0000         1st Qu.:0.0000      
+##  Median :0.0000     Median :0.0000         Median :0.0000      
+##  Mean   :0.4879     Mean   :0.4983         Mean   :0.4953      
+##  3rd Qu.:1.0000     3rd Qu.:1.0000         3rd Qu.:1.0000      
+##  Max.   :1.0000     Max.   :1.0000         Max.   :1.0000      
+##   dep_fatigue     dep_concentration dep_sleep_change dep_psychomotor_agitation
+##  Min.   :0.0000   Min.   :0.0000    Min.   :0.0000   Min.   :0.0000           
+##  1st Qu.:0.0000   1st Qu.:0.0000    1st Qu.:0.0000   1st Qu.:0.0000           
+##  Median :1.0000   Median :0.0000    Median :0.0000   Median :1.0000           
+##  Mean   :0.5009   Mean   :0.4927    Mean   :0.4996   Mean   :0.5076           
+##  3rd Qu.:1.0000   3rd Qu.:1.0000    3rd Qu.:1.0000   3rd Qu.:1.0000           
+##  Max.   :1.0000   Max.   :1.0000    Max.   :1.0000   Max.   :1.0000           
+##  dep_suicidal_thoughts dep_weight_change anx_excessive_worry  anx_fatigue    
+##  Min.   :0.0000        Min.   :0.0000    Min.   :0.0000      Min.   :0.0000  
+##  1st Qu.:0.0000        1st Qu.:0.0000    1st Qu.:0.0000      1st Qu.:0.0000  
+##  Median :1.0000        Median :0.0000    Median :0.0000      Median :1.0000  
+##  Mean   :0.5041        Mean   :0.4908    Mean   :0.4916      Mean   :0.5004  
+##  3rd Qu.:1.0000        3rd Qu.:1.0000    3rd Qu.:1.0000      3rd Qu.:1.0000  
+##  Max.   :1.0000        Max.   :1.0000    Max.   :1.0000      Max.   :1.0000  
+##  anx_sleep_disturbance anx_concentration anx_restlessness anx_irritability
+##  Min.   :0.0000        Min.   :0.0000    Min.   :0.0000   Min.   :0.0000  
+##  1st Qu.:0.0000        1st Qu.:0.0000    1st Qu.:0.0000   1st Qu.:0.0000  
+##  Median :0.0000        Median :1.0000    Median :0.0000   Median :1.0000  
+##  Mean   :0.4991        Mean   :0.5081    Mean   :0.4929   Mean   :0.5057  
+##  3rd Qu.:1.0000        3rd Qu.:1.0000    3rd Qu.:1.0000   3rd Qu.:1.0000  
+##  Max.   :1.0000        Max.   :1.0000    Max.   :1.0000   Max.   :1.0000  
+##  anx_duration_6_months ptsd_experienced_trauma ptsd_witnessed_trauma
+##  Min.   :0.0000        Min.   :0.0000          Min.   :0.0000       
+##  1st Qu.:0.0000        1st Qu.:0.0000          1st Qu.:0.0000       
+##  Median :0.0000        Median :0.0000          Median :1.0000       
+##  Mean   :0.4871        Mean   :0.4857          Mean   :0.5047       
+##  3rd Qu.:1.0000        3rd Qu.:1.0000          3rd Qu.:1.0000       
+##  Max.   :1.0000        Max.   :1.0000          Max.   :1.0000       
+##  ptsd_dissociative_reaction ptsd_distressing_dreams ptsd_distress_at_cues
+##  Min.   :0.0000             Min.   :0.0000          Min.   :0.0000       
+##  1st Qu.:0.0000             1st Qu.:0.0000          1st Qu.:0.0000       
+##  Median :0.0000             Median :1.0000          Median :1.0000       
+##  Mean   :0.4945             Mean   :0.5012          Mean   :0.5039       
+##  3rd Qu.:1.0000             3rd Qu.:1.0000          3rd Qu.:1.0000       
+##  Max.   :1.0000             Max.   :1.0000          Max.   :1.0000       
+##  ptsd_avoid_reminders ptsd_avoid_external_reminders ptsd_negative_beliefs
+##  Min.   :0.0000       Min.   :0.0000                Min.   :0.0000       
+##  1st Qu.:0.0000       1st Qu.:0.0000                1st Qu.:0.0000       
+##  Median :0.0000       Median :0.0000                Median :1.0000       
+##  Mean   :0.4839       Mean   :0.4916                Mean   :0.5031       
+##  3rd Qu.:1.0000       3rd Qu.:1.0000                3rd Qu.:1.0000       
+##  Max.   :1.0000       Max.   :1.0000                Max.   :1.0000       
+##  ptsd_memory_loss ptsd_negative_emotional_state ptsd_diminished_interest
+##  Min.   :0.0000   Min.   :0.000                 Min.   :0.0000          
+##  1st Qu.:0.0000   1st Qu.:0.000                 1st Qu.:0.0000          
+##  Median :0.0000   Median :1.000                 Median :0.0000          
+##  Mean   :0.4863   Mean   :0.502                 Mean   :0.4903          
+##  3rd Qu.:1.0000   3rd Qu.:1.000                 3rd Qu.:1.0000          
+##  Max.   :1.0000   Max.   :1.000                 Max.   :1.0000          
+##  ptsd_detachment  ptsd_no_positive_emotions ptsd_angry_outbursts
+##  Min.   :0.0000   Min.   :0.0000            Min.   :0.0000      
+##  1st Qu.:0.0000   1st Qu.:0.0000            1st Qu.:0.0000      
+##  Median :0.0000   Median :1.0000            Median :0.0000      
+##  Mean   :0.4871   Mean   :0.5009            Mean   :0.4919      
+##  3rd Qu.:1.0000   3rd Qu.:1.0000            3rd Qu.:1.0000      
+##  Max.   :1.0000   Max.   :1.0000            Max.   :1.0000      
+##  ptsd_recklessness ptsd_hypervigilance ptsd_startle_response ptsd_concentration
+##  Min.   :0.0000    Min.   :0.0000      Min.   :0.0000        Min.   :0.0000    
+##  1st Qu.:0.0000    1st Qu.:0.0000      1st Qu.:0.0000        1st Qu.:0.0000    
+##  Median :1.0000    Median :0.0000      Median :0.0000        Median :0.0000    
+##  Mean   :0.5055    Mean   :0.4953      Mean   :0.4996        Mean   :0.4993    
+##  3rd Qu.:1.0000    3rd Qu.:1.0000      3rd Qu.:1.0000        3rd Qu.:1.0000    
+##  Max.   :1.0000    Max.   :1.0000      Max.   :1.0000        Max.   :1.0000    
+##  ptsd_sleep_disturbance ptsd_duration_1_month ptsd_clinical_distress
+##  Min.   :0.0000         Min.   :0.0000        Min.   :0.0000        
+##  1st Qu.:0.0000         1st Qu.:0.0000        1st Qu.:0.0000        
+##  Median :1.0000         Median :1.0000        Median :0.0000        
+##  Mean   :0.5009         Mean   :0.5057        Mean   :0.4815        
+##  3rd Qu.:1.0000         3rd Qu.:1.0000        3rd Qu.:1.0000        
+##  Max.   :1.0000         Max.   :1.0000        Max.   :1.0000        
+##  ptsd_not_substance_induced ptsd_intrusive_memories   dx_bipolar    
+##  Min.   :0.0000             Min.   :0.0000          Min.   :0.0000  
+##  1st Qu.:0.0000             1st Qu.:0.0000          1st Qu.:1.0000  
+##  Median :0.0000             Median :0.0000          Median :1.0000  
+##  Mean   :0.4895             Mean   :0.4972          Mean   :0.7751  
+##  3rd Qu.:1.0000             3rd Qu.:1.0000          3rd Qu.:1.0000  
+##  Max.   :1.0000             Max.   :1.0000          Max.   :1.0000  
+##  dx_schizophrenia dx_depression      dx_anxiety        dx_ptsd       
+##  Min.   :0.0000   Min.   :0.0000   Min.   :0.0000   Min.   :0.00000  
+##  1st Qu.:1.0000   1st Qu.:0.0000   1st Qu.:0.0000   1st Qu.:0.00000  
+##  Median :1.0000   Median :0.0000   Median :0.0000   Median :0.00000  
+##  Mean   :0.8439   Mean   :0.4916   Mean   :0.4322   Mean   :0.05409  
+##  3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:1.0000   3rd Qu.:0.00000  
+##  Max.   :1.0000   Max.   :1.0000   Max.   :1.0000   Max.   :1.00000</code></pre>
 </div>
 <div id="interactive-component" class="section level1">
 <h1>Interactive component</h1>
