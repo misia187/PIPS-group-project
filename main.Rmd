@@ -1,0 +1,46 @@
+
+---
+title: "PIPS Group Project"
+author: "PIPS Group"
+output: html_document
+---
+
+# Introduction
+
+This project was developed for the Programming in Psychological Science course at the University of Amsterdam.
+
+The project investigates psychological data and aims to combine data exploration, statistical analyses, visualisations, and an interactive component.
+
+# Dataset
+
+The dataset used in this project is stored in the `data` folder.
+
+```{r load-data}
+clindata <- read.csv("data/Mentalillness.csv")
+head(clindata)
+```
+
+# Dataset overview
+
+```{r data-overview}
+dim(clindata)
+names(clindata)
+summary(clindata)
+```
+
+# Interactive component
+
+This section will be completed when the interactive component is ready.
+
+# Statistical analysis
+
+This section will be completed when the analysis functions are ready.
+
+# Discussion
+
+This section will contain the interpretation and limitations of our findings.
+
+# References
+
+Dataset and literature references will be added here.
+  
