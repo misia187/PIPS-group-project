@@ -13,11 +13,25 @@ The project investigates psychological data and aims to combine data exploration
 
 # Dataset
 
-The dataset used in this project is stored in the `data` folder.
+The dataset (Mentalillness.csv, Kaggle) contains 3,753 synthetic participants
+with 53 binary DSM-5 symptoms and criteria (0 = absent, 1 = present) and 5
+binary diagnoses: bipolar disorder, schizophrenia, depression, anxiety
+disorder, and PTSD. It is stored in the `data` folder.
+
+Because the original column names are long, we first build a variable key that
+gives each column a short name and records which disorder and DSM-5 criterion
+it belongs to. The key is saved as `data/variable_key.csv`. We then load the
+data with these short names and check that every value is 0 or 1.
 
 ```{r load-data}
-clindata <- read.csv("data/Mentalillness.csv")
-head(clindata)
+source("src/r/functions.R")
+source("src/r/variable_key.R")
+
+variable_key <- make_variable_key()
+save_variable_key(variable_key, "data/variable_key.csv")
+clindata <- load_mental_illness("data/Mentalillness.csv", variable_key)
+
+knitr::kable(head(variable_key, 10))
 ```
 
 # Dataset overview
