@@ -375,8 +375,8 @@ key that gives each column a short name and records which disorder and
 DSM-5 criterion it belongs to. The key is saved as
 <code>data/variable_key.csv</code>. We then load the data with these
 short names and check that every value is 0 or 1.</p>
-<pre class="r"><code>source(&quot;src/r/functions.R&quot;)
-source(&quot;src/r/variable_key.R&quot;)
+<pre class="r"><code>source(&quot;src/r/functions_data.R&quot;)
+source(&quot;src/r/functions_variable_key.R&quot;)
 
 variable_key &lt;- make_variable_key()
 save_variable_key(variable_key, &quot;data/variable_key.csv&quot;)</code></pre>
@@ -465,14 +465,12 @@ for painful consequences</td>
 </table>
 <div id="dsm-rules" class="section level2">
 <h2>DSM rules</h2>
-<p>The diagnoses in the dataset follow fixed counting rules. Here we
-rebuild all five diagnoses from the symptom columns and check that they
-match the diagnoses in the data.</p>
-<pre class="r"><code>source(&quot;src/r/dsm_rules.R&quot;)
-
-clindata &lt;- apply_dsm_rules(clindata, variable_key)
-rule_check &lt;- verify_dsm_rules(clindata)</code></pre>
-<pre><code>## All five diagnoses are reproduced exactly (3753 of 3753 rows).</code></pre>
+<p>The diagnoses in the dataset follow fixed counting rules. The script
+<code>test_dsm_rules.R</code> rebuilds all five diagnoses from the
+symptom columns (with <code>apply_dsm_rules()</code>) and checks them in
+two ways.</p>
+<p>First, it checks that the rebuilt diagnoses match the diagnoses in
+the data for every participant.</p>
 <pre class="r"><code>knitr::kable(rule_check)</code></pre>
 <table>
 <thead>
@@ -524,18 +522,10 @@ rule_check &lt;- verify_dsm_rules(clindata)</code></pre>
 </table>
 <div id="tests" class="section level3">
 <h3>Tests</h3>
-<p>To check that the rules work at the cutoffs, we test them on made-up
-participants whose diagnosis we know in advance.</p>
-<pre class="r"><code>source(&quot;src/r/test_dsm_rules.R&quot;)
-
-test_results &lt;- test_dsm_rules(clindata, variable_key)</code></pre>
-<pre><code>## PASS: Bipolar: 3 symptoms = yes, 2 = no</code></pre>
-<pre><code>## PASS: Depression: 5 symptoms = yes, 4 = no</code></pre>
-<pre><code>## PASS: Anxiety: needs 2 symptoms AND duration</code></pre>
-<pre><code>## PASS: Schizophrenia: positive symptom needed, 2 items in total</code></pre>
-<pre><code>## PASS: PTSD: all minimums = yes, missing G or 1 D item = no</code></pre>
-<pre><code>## PASS: Thresholds: bipolar cutoff 2 diagnoses someone with 2 symptoms</code></pre>
-<pre><code>## All 6 tests passed.</code></pre>
+<p>Second, it tests the rules on made-up participants placed exactly at
+a cutoff (or just below it), whose diagnosis we know in advance. This is
+where mistakes like <code>&gt;</code> instead of <code>&gt;=</code>
+would show up.</p>
 <pre class="r"><code>knitr::kable(test_results)</code></pre>
 <table>
 <colgroup>

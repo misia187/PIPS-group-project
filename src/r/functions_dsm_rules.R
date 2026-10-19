@@ -1,13 +1,13 @@
-# Script: dsm_rules.R
-# Purpose: Rebuild the five diagnoses in the Mentalillness dataset from the
-#          symptom columns, using DSM-style counting rules, and check that
-#          the rebuilt diagnoses match the dx_ columns in the data.
-#          Sourcing this script only defines the functions; main.Rmd calls them.
-#          Needs the variable key from variable_key.R and the renamed data
-#          from load_mental_illness() in functions.R.
-#          apply_dsm_rules() can also be used for the simulation: change the
-#          thresholds to see what happens to prevalence and comorbidity.
-# Date: 2026-10-18
+# Script: functions_dsm_rules.R
+# Purpose: Defines the DSM-style counting rules that rebuild the five
+#          diagnoses from the symptom columns, plus two small helpers for
+#          testing the rules. This file only defines things; the script
+#          test_dsm_rules.R runs the checks, and analyses.R uses the rules.
+#          apply_dsm_rules() is a function because it is run many times:
+#          on the real data, in every test, and in the simulation (with
+#          changed thresholds).
+#          Needs the variable key from variable_key.R.
+# Date: 2026-10-19
 
 #-------------------------------------------------------------------
 # 1. LOAD PACKAGES
@@ -25,15 +25,14 @@ suppressPackageStartupMessages(library(dplyr))
 #                 total (6 symptoms + the 1-month duration item)
 #   PTSD          A >= 1, B >= 1, C >= 1, D >= 2, E >= 2,
 #                 and F, G and H all present
+#
+# default_thresholds is a plain list. To try a different rule, copy it
+# and change a number:
+#   th <- default_thresholds
+#   th$depression <- 4
 #-------------------------------------------------------------------
 
-# default_thresholds()
-# Gives the minimum number of items needed for each rule.
-# Input:  none
-# Output: a named list of numbers. Change a number to try a different rule,
-#         e.g. th <- default_thresholds(); th$depression <- 4
-default_thresholds <- function() {
-  list(
+default_thresholds <- list(
     bipolar       = 3,  # symptoms out of 7
     depression    = 5,  # symptoms out of 9
     anxiety       = 2,  # symptoms out of 6 (plus 6-month duration)
@@ -45,10 +44,9 @@ default_thresholds <- function() {
     ptsd_D        = 2,  # cognition and mood, out of 6
     ptsd_E        = 2   # arousal, out of 6
   )
-}
 
 #-------------------------------------------------------------------
-# 3. HELPER FUNCTIONS
+# 3. LOOK UP COLUMNS
 #-------------------------------------------------------------------
 
 # get_columns()
@@ -68,15 +66,6 @@ get_columns <- function(key, disorder, criterion) {
   columns
 }
 
-# count_items()
-# Counts, for each participant, how many of the given columns are 1.
-# Input:  dataset = a data frame with 0/1 columns
-#         columns = names of the columns to count
-# Output: a vector with one count per participant (row)
-count_items <- function(dataset, columns) {
-  rowSums(dataset[, columns, drop = FALSE])
-}
-
 #-------------------------------------------------------------------
 # 4. APPLY THE RULES
 #-------------------------------------------------------------------
@@ -90,26 +79,28 @@ count_items <- function(dataset, columns) {
 # Output: the same data frame with extra columns:
 #         n_  = symptom counts (e.g. n_bipolar, n_ptsd_D)
 #         rule_ = rebuilt diagnosis, 0 or 1 (e.g. rule_bipolar)
-apply_dsm_rules <- function(dataset, key, thresholds = default_thresholds()) {
+
+apply_dsm_rules <- function(dataset, key, thresholds = default_thresholds) {
   th <- thresholds
   
   # Step 1: count symptoms per disorder
-  dataset$n_bipolar    <- count_items(dataset, get_columns(key, "bipolar", "symptom"))
-  dataset$n_depression <- count_items(dataset, get_columns(key, "depression", "symptom"))
-  dataset$n_anxiety    <- count_items(dataset, get_columns(key, "anxiety", "symptom"))
+  # (rowSums adds up the 0/1 columns for each participant)
+  dataset$n_bipolar    <- rowSums(dataset[, get_columns(key, "bipolar", "symptom")])
+  dataset$n_depression <- rowSums(dataset[, get_columns(key, "depression", "symptom")])
+  dataset$n_anxiety    <- rowSums(dataset[, get_columns(key, "anxiety", "symptom")])
   
   # Schizophrenia: positive symptoms, and all items together
   # (positive + other symptoms + the 1-month duration item)
-  dataset$n_scz_positive <- count_items(dataset, get_columns(key, "schizophrenia", "positive"))
-  dataset$n_scz_total    <- count_items(dataset, get_columns(key, "schizophrenia",
-                                                             c("positive", "other", "duration")))
+  dataset$n_scz_positive <- rowSums(dataset[, get_columns(key, "schizophrenia", "positive")])
+  dataset$n_scz_total    <- rowSums(dataset[, get_columns(key, "schizophrenia",
+                                                          c("positive", "other", "duration"))])
   
   # PTSD: one count per DSM-5 criterion
-  dataset$n_ptsd_A <- count_items(dataset, get_columns(key, "ptsd", "A_exposure"))
-  dataset$n_ptsd_B <- count_items(dataset, get_columns(key, "ptsd", "B_intrusion"))
-  dataset$n_ptsd_C <- count_items(dataset, get_columns(key, "ptsd", "C_avoidance"))
-  dataset$n_ptsd_D <- count_items(dataset, get_columns(key, "ptsd", "D_cognition_mood"))
-  dataset$n_ptsd_E <- count_items(dataset, get_columns(key, "ptsd", "E_arousal"))
+  dataset$n_ptsd_A <- rowSums(dataset[, get_columns(key, "ptsd", "A_exposure")])
+  dataset$n_ptsd_B <- rowSums(dataset[, get_columns(key, "ptsd", "B_intrusion")])
+  dataset$n_ptsd_C <- rowSums(dataset[, get_columns(key, "ptsd", "C_avoidance")])
+  dataset$n_ptsd_D <- rowSums(dataset[, get_columns(key, "ptsd", "D_cognition_mood")])
+  dataset$n_ptsd_E <- rowSums(dataset[, get_columns(key, "ptsd", "E_arousal")])
   
   # Step 2: turn the counts into diagnoses (1 = rule met, 0 = not met)
   dataset <- dataset %>%
@@ -135,46 +126,42 @@ apply_dsm_rules <- function(dataset, key, thresholds = default_thresholds()) {
 }
 
 #-------------------------------------------------------------------
-# 5. VERIFY THE RULES
+# 5. HELPERS FOR TESTING THE RULES
+# Used by every test in test_dsm_rules.R
 #-------------------------------------------------------------------
 
-# verify_dsm_rules()
-# Compares each rebuilt diagnosis (rule_) with the diagnosis in the data (dx_).
-# Input:  dataset = output of apply_dsm_rules()
-# Output: a data frame with one row per disorder: how many participants
-#         have the diagnosis in the data, how many by our rule, and how
-#         many rows agree. Prints a message saying whether all rows match.
-verify_dsm_rules <- function(dataset) {
-  disorders <- c("bipolar", "depression", "anxiety", "schizophrenia", "ptsd")
-  results <- data.frame()
+# make_test_people()
+# Makes made-up participants with every symptom set to 0, so each test
+# can switch on exactly the symptoms it needs.
+# Input:  dataset = the renamed data (used as a template for the columns)
+#         key     = the variable key from make_variable_key()
+#         n       = how many participants to make
+# Output: a data frame with n rows, all symptom/criterion columns 0
+make_test_people <- function(dataset, key, n) {
+  people <- dataset[rep(1, n), ]   # n copies of the first row
+  rownames(people) <- NULL
   
-  for (disorder in disorders) {
-    # Stop if apply_dsm_rules() has not been run on this data yet
-    if (!(paste0("rule_", disorder) %in% names(dataset))) {
-      stop("Column rule_", disorder, " not found. ",
-           "Run apply_dsm_rules() first and pass its output to verify_dsm_rules().")
-    }
-    
-    observed <- dataset[[paste0("dx_", disorder)]]
-    rebuilt  <- dataset[[paste0("rule_", disorder)]]
-    
-    n_match <- sum(observed == rebuilt)
-    
-    results <- rbind(results, data.frame(
-      disorder      = disorder,
-      n_observed    = sum(observed),
-      n_rebuilt     = sum(rebuilt),
-      n_match       = n_match,
-      percent_match = round(100 * n_match / nrow(dataset), 2)
-    ))
-  }
-  
-  if (all(results$n_match == nrow(dataset))) {
-    message("All five diagnoses are reproduced exactly (",
-            nrow(dataset), " of ", nrow(dataset), " rows).")
-  } else {
-    message("Not all diagnoses match: see the n_match column.")
-  }
-  
-  results
+  symptom_cols <- key$name[key$criterion != "diagnosis"]
+  people[, symptom_cols] <- 0
+  people
 }
+
+# check_result()
+# Compares what the rules gave with what we expected and prints the result.
+# Input:  test_name = short description of the test
+#         actual    = rebuilt diagnoses (e.g. result$rule_bipolar)
+#         expected  = the diagnoses we expect, e.g. c(1, 0)
+# Output: TRUE if the test passed, FALSE if not (and prints PASS or FAIL)
+check_result <- function(test_name, actual, expected) {
+  passed <- all(actual == expected)
+  
+  if (passed) {
+    message("PASS: ", test_name)
+  } else {
+    message("FAIL: ", test_name,
+            " (expected ", paste(expected, collapse = ", "),
+            ", got ", paste(actual, collapse = ", "), ")")
+  }
+  passed
+}
+
