@@ -1,15 +1,27 @@
 
 ---
-title: "PIPS Group Project"
-author: "PIPS Group"
-output: html_document
+title: "Exploring Symptom Patterns and Diagnostic Classification"
+subtitle: "A Computational Analysis of Synthetic Mental Health Data"
+author: "PIPS Group: Tess, Sherilyn, Misia | Programming in Psychological Science"
+date: "2026-10-20"
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+    theme: readable
 ---
 
 # Introduction
 
-This project was developed for the Programming in Psychological Science course at the University of Amsterdam.
+This project examines the relationship between psychiatric symptoms and diagnostic classifications using a synthetic mental health dataset. The dataset contains binary indicators representing symptoms and diagnostic criteria associated with five psychiatric disorders: bipolar disorder, schizophrenia, depression, anxiety disorders, and post-traumatic stress disorder (PTSD).
 
-The project investigates psychological data and aims to combine data exploration, statistical analyses, visualisations, and an interactive component.
+The primary aim is to explore how symptom patterns relate to diagnostic outcomes and to demonstrate how statistical and computational methods can be used to investigate these relationships. Specifically, the project addresses three questions: (1) How strongly are individual symptoms associated with their corresponding diagnoses and with other psychiatric diagnoses? (2) To what extent do different diagnoses co-occur in the dataset? (3) How do symptom counts and diagnostic thresholds influence the likelihood of meeting the dataset's diagnostic classification rules?
+
+To address these questions, the project combines data preparation and validation, rule-based diagnostic classification, statistical association tests, and graphical visualisations. An interactive component is also planned to allow users to explore selected aspects of the data or classification rules.
+
+Importantly, the dataset is synthetically generated, and its diagnostic indicators follow predefined rules. Consequently, the analyses primarily demonstrate computational and statistical relationships within the simulated data rather than providing empirical evidence about symptom distributions, diagnostic validity, or comorbidity in clinical populations.
 
 # Dataset
 
@@ -64,11 +76,37 @@ knitr::kable(test_results)
 
 # Dataset overview
 
-```{r data-overview}
-dim(clindata)
-names(clindata)
-summary(clindata)
+
+```{r dataset-summary, echo=FALSE}
+dataset_overview <- data.frame(
+  Characteristic = c(
+    "Number of participants",
+    "Total number of variables",
+    "Symptom and diagnostic criterion variables",
+    "Diagnostic indicators",
+    "Missing values",
+    "Dataset type"
+  ),
+  Value = c(
+    nrow(clindata),
+    ncol(clindata),
+    nrow(variable_key) - 5,
+    5,
+    sum(is.na(clindata)),
+    "Synthetic"
+  )
+)
+
+knitr::kable(
+  dataset_overview,
+  caption = "Overview of the mental health dataset"
+)
 ```
+The dataset contains 3,753 synthetic participant records. Individual symptoms and diagnostic criteria are represented using binary variables, with 0 indicating absence and 1 indicating presence. Diagnostic indicators identify whether each participant meets the corresponding classification rules.
+
+The original variable names are mapped to shorter, standardised names using a variable key. This facilitates reproducible data processing and statistical analysis while preserving the correspondence between variables and their original descriptions.
+
+Because the dataset was generated synthetically, its distributions and diagnostic relationships should not be interpreted as representative of clinical populations.
 
 # Interactive component
 

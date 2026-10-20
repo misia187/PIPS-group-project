@@ -1,46 +1,185 @@
 # PIPS Group Project
 
-This repository contains a group project for the Programming in Psychological Science course at the University of Amsterdam.
+## Psychiatric Symptom Patterns and Diagnostic Classification
 
-The project uses psychological data and will include an interactive component, statistical analyses, and data visualisations.
+This repository contains a group project developed for the *Programming in Psychological Science* course at the University of Amsterdam.
 
-## Project structure
+The project explores relationships between psychiatric symptoms and diagnostic classifications using a synthetic mental health dataset. It combines data processing, diagnostic rule verification, statistical analyses, visualisations, and an interactive Shiny application.
 
-- `data/` — Dataset used in the project.
-- `src/` — R scripts and reusable functions.
-- `tests/` — Independent tests and error checks.
-- `main.Rmd` — Main R Markdown document.
-- `README.md` — Documentation and instructions.
+**The project is intended for educational purposes and does not provide clinical diagnoses.**
 
-## Getting started
+## Project objectives
 
-1. Download or clone the GitHub repository.
-2. Open `PIPS-group-project.Rproj` in RStudio.
-3. Install the packages required for R Markdown if they are not already installed:
+The project addresses three main questions:
 
-   `install.packages(c("rmarkdown", "knitr"))`
+1. How are individual psychiatric symptoms associated with their corresponding diagnoses and with other diagnoses?
+2. To what extent do different psychiatric diagnoses co-occur in the dataset?
+3. How do symptom counts and predefined diagnostic thresholds influence classification outcomes?
 
-4. Open `main.Rmd`.
-5. Click **Knit** to produce the HTML document.
-
-The interactive component and analyses will be integrated once completed.
+The interactive component additionally aims to demonstrate how changes to symptom profiles can influence diagnostic classifications.
 
 ## Dataset
 
-The dataset is stored in `data/Mentalillness.csv`.
+The project uses `Mentalillness.csv`, a synthetic mental health dataset obtained from Kaggle.
 
-The data source, relevant variables, and references will be documented in the final version.
+The original dataset contains 3,753 participant records and 58 binary symptom, criterion, and diagnostic variables covering five psychiatric disorders:
 
-## Testing
+- Bipolar disorder
+- Schizophrenia
+- Depression
+- Anxiety disorder
+- Post-traumatic stress disorder (PTSD)
 
-To run the preliminary project checks, enter the following in the R console from the project's main directory:
+Variables are coded as 0 (absent) or 1 (present).
 
-`source("tests/test_functions.R")`
+A variable key maps the original column names to shorter, standardised names and identifies their associated disorders and criteria.
 
-The testing script currently verifies that the dataset and essential files exist and that the data has a valid basic structure.
+**Important:** The data are synthetically generated, and diagnostic outcomes follow predefined classification rules. Results should not be interpreted as representative of real clinical populations.
 
-Additional tests for the group's functions will be added as development progresses.
+## Project components
 
-## Project status
+### 1. Data preparation and validation
 
-Work in progress.
+The project loads the dataset, standardises variable names, checks binary values, and constructs a variable key.
+
+### 2. Diagnostic rule verification
+
+The five diagnostic indicators are reconstructed using predefined DSM-style classification rules.
+
+The implementation includes checks of agreement with the original diagnosis variables and tests of selected threshold conditions.
+
+### 3. Statistical analyses
+
+The project includes:
+
+- Chi-square tests of symptom–diagnosis associations
+- Phi coefficients as measures of association
+- False discovery rate correction for multiple testing
+- Comparisons of observed and expected diagnostic co-occurrence
+- Visualisations of symptom counts and diagnostic thresholds
+
+### 4. Data visualisations
+
+Three principal figures are generated:
+
+- A symptom–diagnosis association heatmap
+- An observed-versus-expected comorbidity plot
+- A symptom-count and diagnostic-classification plot
+
+Figures and result tables are saved in the `output/` directory.
+
+### 5. Interactive Shiny application
+
+The Shiny application allows users to select a dataset row and explore its recorded symptom profile and diagnostic indicators.
+
+Symptoms are grouped by disorder and classification criterion, alongside a reference section for diagnostic criteria.
+
+**Current development status:** The initial prototype displays symptom profiles and diagnostic labels. Interactive symptom modifications are not yet connected to recalculation of the diagnoses. This functionality is planned for a later update.
+
+## Repository structure
+
+```text
+PIPS-group-project/
+├── data/
+│   ├── Mentalillness.csv
+│   └── variable_key.csv
+├── src/
+│   └── r/
+│       ├── functions_data.R
+│       ├── functions_variable_key.R
+│       ├── functions_dsm_rules.R
+│       ├── functions_analysis.R
+│       ├── analyses.R
+│       ├── plots.R
+│       └── test_dsm_rules.R
+├── tests/
+│   └── test_functions.R
+├── output/
+│   ├── figures/
+│   └── tables/
+├── main.Rmd
+├── Shiny_Sim.Rmd
+├── README.md
+└── PIPS-group-project.Rproj
+```
+
+`Shiny_Sim.Rmd` is available after its pull request is merged into the main branch. Additional development files may also be present.
+
+## Getting started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/misia187/PIPS-group-project.git
+```
+
+Alternatively, download the ZIP file from GitHub.
+
+### 2. Open the project
+
+Open `PIPS-group-project.Rproj` in RStudio.
+
+Keep the project directory structure intact because the scripts use relative file paths.
+
+### 3. Install dependencies
+
+The project uses R, R Markdown, and Shiny, together with packages required by the statistical analyses and plots.
+
+For the document and interactive component:
+
+```r
+install.packages(c("rmarkdown", "knitr", "shiny"))
+```
+
+Additional analysis and plotting dependencies should be verified against the source scripts and documented before final submission.
+
+## Running the statistical report
+
+1. Open `main.Rmd` in RStudio.
+2. Click **Knit** to render the document.
+3. Review the generated HTML report.
+
+The document includes dataset information, diagnostic rule verification, statistical results, and visualisations.
+
+## Running the Shiny application
+
+Open `Shiny_Sim.Rmd` in RStudio.
+
+The application relies on the project's data and DSM-rule functions and should be launched from within the project directory.
+
+The final tested launch command will be documented once the Shiny component has been fully integrated.
+
+## Running the tests
+
+Preliminary project and data checks can be run from the project directory:
+
+```r
+source("tests/test_functions.R")
+```
+
+The project also contains DSM-rule verification code in:
+
+`src/r/test_dsm_rules.R`
+
+Additional independent function tests are being developed.
+
+## Methodological limitations
+
+The dataset is synthetic, and the diagnostic indicators are determined by predefined rules. Consequently:
+
+- Symptom–diagnosis associations may partly reflect the classification rules used to generate the diagnoses.
+- The observed patterns do not establish diagnostic validity in real clinical populations.
+- A nonsignificant statistical test does not demonstrate the absence of a relationship.
+- The simplified classification rules should not be considered substitutes for comprehensive DSM-5 clinical assessment.
+
+## Data source and citation
+
+The dataset was obtained from Kaggle. The complete dataset title, original creator, URL, and retrieval details will be added after source verification.
+
+To reference this project, include the repository name, contributors, year, and URL:
+
+https://github.com/misia187/PIPS-group-project
+
+## Development status
+
+This project is under active development. The statistical analysis and diagnostic verification components have been implemented. The Shiny prototype is being extended, and documentation, integration, and independent testing are ongoing.
