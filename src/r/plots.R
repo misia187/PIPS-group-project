@@ -115,9 +115,9 @@ steps_plot <- ggplot(count_steps, aes(x = n_symptoms, y = prop_diagnosed)) +
   scale_y_continuous(limits = c(0, 1)) +
   scale_size(range = c(1, 4)) +   # smallest group still visible
   labs(title = "Proportion diagnosed by number of symptoms",
-       subtitle = "Dashed line = cutoff in default_thresholds; point size = number of participants",
+       subtitle = "Dashed line = cutoff for diagnosis; point size = number of participants",
        x = "Number of symptoms present", y = "Proportion diagnosed",
-       size = "# patients (n)") +
+       size = "# ppts (n)") +
   theme_minimal()
 
 print(steps_plot)
