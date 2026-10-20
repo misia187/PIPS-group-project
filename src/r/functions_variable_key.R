@@ -1,8 +1,9 @@
-# Script: variable_key.R
-# Purpose: Build the variable key for the Mentalillness dataset: one row per
-#          column with its original name, a short name, the disorder it
+# Script: functions_variable_key.R
+# Purpose: Defines the variable key for the Mentalillness dataset: one row
+#          per column with its original name, a short name, the disorder it
 #          belongs to, and the DSM-5 criterion it counts toward.
-#          Uses key_row() from functions.R, so source that script first.
+#          This file only defines functions; the run scripts source it and
+#          call make_variable_key().
 # Date: 2026-10-18
 
 #-------------------------------------------------------------------
@@ -11,7 +12,30 @@
 #-------------------------------------------------------------------
 
 #-------------------------------------------------------------------
-# 2. BUILD VARIABLE KEY
+# 2. HELPERS
+#-------------------------------------------------------------------
+
+# key_row()
+# Turns the description of one column into one row of the variable key.
+# Input:  original name, short name, disorder, criterion (all text)
+# Output: a data frame with one row
+key_row <- function(original, name, disorder, criterion) {
+  data.frame(original = original, name = name,
+             disorder = disorder, criterion = criterion)
+}
+
+# save_variable_key()
+# Saves the variable key as a table so it can be opened outside R.
+# Input:  key  = the variable key from make_variable_key()
+#         path = where to save it (default: data/variable_key.csv)
+# Output: none (writes a CSV file)
+save_variable_key <- function(key, path = "data/variable_key.csv") {
+  write.csv(key, path, row.names = FALSE)
+  message("Variable key saved to ", path)
+}
+
+#-------------------------------------------------------------------
+# 3. BUILD VARIABLE KEY
 # Columns of the key:
 #   original  = column name in the CSV
 #   name      = short name we use in R
@@ -28,6 +52,11 @@
 #                 and F, G and H all present
 #-------------------------------------------------------------------
 
+# make_variable_key()
+# Builds the full variable key.
+# Input:  none
+# Output: a data frame with 58 rows (53 symptoms/criteria + 5 diagnoses)
+#         and columns original, name, disorder, criterion
 # make_variable_key()
 # Builds the full variable key.
 # Input:  none

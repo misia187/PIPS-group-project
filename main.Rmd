@@ -24,8 +24,8 @@ it belongs to. The key is saved as `data/variable_key.csv`. We then load the
 data with these short names and check that every value is 0 or 1.
 
 ```{r load-data}
-source("src/r/functions.R")
-source("src/r/variable_key.R")
+source("src/r/functions_data.R")
+source("src/r/functions_variable_key.R")
 
 variable_key <- make_variable_key()
 save_variable_key(variable_key, "data/variable_key.csv")
@@ -33,6 +33,34 @@ clindata <- load_mental_illness("data/Mentalillness.csv", variable_key)
 
 knitr::kable(head(variable_key, 10))
 ```
+
+## DSM rules
+
+The diagnoses in the dataset follow fixed counting rules. The script
+`test_dsm_rules.R` rebuilds all five diagnoses from the symptom columns
+(with `apply_dsm_rules()`) and checks them in two ways.
+
+```{r dsm-checks, include = FALSE}
+source("src/r/test_dsm_rules.R")
+```
+
+First, it checks that the rebuilt diagnoses match the diagnoses in the data
+for every participant.
+
+```{r dsm-rule-check}
+knitr::kable(rule_check)
+```
+
+### Tests
+
+Second, it tests the rules on made-up participants placed exactly at a
+cutoff (or just below it), whose diagnosis we know in advance. This is where
+mistakes like `>` instead of `>=` would show up.
+
+```{r dsm-tests}
+knitr::kable(test_results)
+```
+
 
 # Dataset overview
 

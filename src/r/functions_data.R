@@ -1,7 +1,9 @@
-# Script: functions.R
-# Purpose: General helper functions for loading and checking the
-#          Mentalillness dataset. Sourcing this script only defines the
-#          functions; main.Rmd calls them.
+# Script: functions_data.R
+# Purpose: Defines the functions for loading and checking the Mentalillness
+#          dataset. This file only defines functions; the run scripts
+#          (test_dsm_rules.R, analyses.R) source it and call them.
+#          load_mental_illness() needs the variable key from
+#          functions_variable_key.R.
 # Date: 2026-10-18
 
 #-------------------------------------------------------------------
@@ -10,30 +12,7 @@
 #-------------------------------------------------------------------
 
 #-------------------------------------------------------------------
-# 2. VARIABLE KEY HELPERS
-#-------------------------------------------------------------------
-
-# key_row()
-# Turns the description of one column into one row of the variable key.
-# Input:  original name, short name, disorder, criterion (all text)
-# Output: a data frame with one row
-key_row <- function(original, name, disorder, criterion) {
-  data.frame(original = original, name = name,
-             disorder = disorder, criterion = criterion)
-}
-
-# save_variable_key()
-# Saves the variable key as a table so it can be opened outside R.
-# Input:  key  = the variable key from make_variable_key()
-#         path = where to save it (default: data/variable_key.csv)
-# Output: none (writes a CSV file)
-save_variable_key <- function(key, path = "data/variable_key.csv") {
-  write.csv(key, path, row.names = FALSE)
-  message("Variable key saved to ", path)
-}
-
-#-------------------------------------------------------------------
-# 3. CHECK DATA
+# 2. CHECK DATA
 #-------------------------------------------------------------------
 
 # check_binary()
@@ -41,6 +20,7 @@ save_variable_key <- function(key, path = "data/variable_key.csv") {
 # Input:  dataset = a data frame
 #         columns = names of the columns to check
 # Output: none; stops with an error naming the first column that fails
+
 check_binary <- function(dataset, columns) {
   for (col in columns) {
     if (!all(dataset[[col]] %in% c(0, 1))) {
@@ -51,7 +31,7 @@ check_binary <- function(dataset, columns) {
 }
 
 #-------------------------------------------------------------------
-# 4. LOAD AND RENAME DATA
+# 3. LOAD AND RENAME DATA
 #-------------------------------------------------------------------
 
 # load_mental_illness()
@@ -90,3 +70,4 @@ load_mental_illness <- function(path = "data/Mentalillness.csv", key) {
   check_binary(dataset, key$name)
   dataset
 }
+
