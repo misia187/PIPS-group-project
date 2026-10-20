@@ -76,7 +76,71 @@ This section will be completed when the interactive component is ready.
 
 # Statistical analysis
 
-This section will be completed when the analysis functions are ready.
+The script `analyses.R` runs the tests and `plots.R` makes the figures.
+
+```{r analyses, include = FALSE}
+source("src/r/analyses.R")
+source("src/r/plots.R")
+```
+
+## Worked example
+
+To show how each test works, we test whether depressed mood is related to a
+depression diagnosis. A chi-square test compares the observed counts with the
+counts expected if the two were unrelated; phi gives the size of the relation.
+
+```{r worked-example}
+example_table
+example_test
+round(example_phi, 3)
+```
+
+Depressed mood was related to a depression diagnosis, χ²(1) = 284.84,
+p < .001, φ = .28.
+
+## Symptoms and diagnoses
+
+We repeated this test for every symptom against every diagnosis
+(53 × 5 = 265 tests) and corrected the p-values for multiple testing (FDR).
+
+```{r symptom-summary}
+knitr::kable(association_summary)
+```
+
+```{r symptom-heatmap, fig.height = 10, fig.width = 7}
+heatmap_plot
+```
+
+37 of 53 symptoms were related to their own diagnosis, and none of the 212
+symptom–other-diagnosis pairs were related. Each diagnosis depends only on its
+own symptoms. The 16 non-significant symptoms are all PTSD symptoms: PTSD needs
+all eight criteria at once, so a single symptom barely changes the odds.
+
+## Comorbidity
+
+For every pair of diagnoses, we compared how many participants have both with
+how many would have both by chance.
+
+```{r comorbidity}
+knitr::kable(comorbidity, digits = 3)
+comorbidity_plot
+```
+
+No pair co-occurred more or less often than expected by chance (all FDR
+p > .31). Comorbidity in this dataset is pure chance, unlike in real clinical
+data.
+
+## Symptom count and diagnosis
+
+```{r count-steps, fig.height = 6, fig.width = 8}
+steps_plot
+```
+
+For bipolar and depression, the proportion diagnosed jumps from 0 to 1 exactly
+at the cutoff. For anxiety it levels off at about .50, because the diagnosis
+also needs the 6-month duration item, which half of participants have. For
+schizophrenia it rises gradually, because a positive symptom is also needed.
+The dip at 6 anxiety symptoms reflects chance in a small group (n = 66).
 
 # Discussion
 
