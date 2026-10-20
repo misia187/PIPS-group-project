@@ -103,7 +103,6 @@ PIPS-group-project/
 └── PIPS-group-project.Rproj
 ```
 
-`Shiny_Sim.Rmd` is available after its pull request is merged into the main branch. Additional development files may also be present.
 
 ## Getting started
 
@@ -143,11 +142,16 @@ The document includes dataset information, diagnostic rule verification, statist
 
 ## Running the Shiny application
 
-Open `Shiny_Sim.Rmd` in RStudio.
+1. Open `PIPS-group-project.Rproj` in RStudio.
+2. Ensure the `shiny`, `rmarkdown`, and `knitr` packages are installed.
+3. Open `Shiny_Sim.Rmd`.
+4. Run the document's setup and application code to launch the Shiny interface.
 
-The application relies on the project's data and DSM-rule functions and should be launched from within the project directory.
+The current prototype allows users to select a dataset row and explore its recorded psychiatric symptoms and diagnostic labels.
 
-The final tested launch command will be documented once the Shiny component has been fully integrated.
+**Current limitation:** Changing individual symptom selections does not yet recalculate diagnostic classifications. The application currently presents the original diagnostic labels determined by the project's predefined classification rules.
+
+The simulation is intended for educational purposes and should not be used for clinical assessment.
 
 ## Running the tests
 
