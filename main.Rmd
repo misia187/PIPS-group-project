@@ -25,6 +25,7 @@ Importantly, the dataset is synthetically generated, and its diagnostic indicato
 
 # Dataset
 
+The dataset was obtained from Kaggle (Karanbakshi1, n.d.).
 The dataset (Mentalillness.csv, Kaggle) contains 3,753 synthetic participants
 with 53 binary DSM-5 symptoms and criteria (0 = absent, 1 = present) and 5
 binary diagnoses: bipolar disorder, schizophrenia, depression, anxiety
@@ -110,7 +111,17 @@ Because the dataset was generated synthetically, its distributions and diagnosti
 
 # Interactive component
 
-This section will be completed when the interactive component is ready.
+The project includes an interactive Shiny application, implemented in `Shiny_Sim.Rmd`, designed to help users explore symptom profiles and diagnostic classifications within the synthetic dataset.
+
+Users can select an individual dataset row to view its corresponding diagnostic indicators and symptom profile. Symptoms are organised by psychiatric disorder and diagnostic criterion, with visual indicators distinguishing present and absent symptoms. The application also provides expandable sections intended for reference information about diagnostic criteria.
+
+The application uses the same data-processing and DSM-style classification functions as the statistical analyses, helping maintain consistency between the project's computational components.
+
+**Current functionality and limitations.** The initial prototype displays the selected participant's recorded symptoms and reconstructed diagnostic labels. Although symptom indicators are presented as interactive controls, changing them does not yet recalculate diagnostic classifications. A future version will allow users to modify symptoms and compare the resulting classifications with the original dataset labels while keeping the diagnostic thresholds fixed.
+
+The application is intended exclusively as an educational demonstration of simplified, rule-based classification using synthetic data. It is not a clinical diagnostic tool.
+
+To explore the interactive component, open `Shiny_Sim.Rmd` in RStudio and run the application code. Additional setup instructions are provided in the repository's `README.md`.
 
 # Statistical analysis
 
@@ -182,9 +193,44 @@ The dip at 6 anxiety symptoms reflects chance in a small group (n = 66).
 
 # Discussion
 
-This section will contain the interpretation and limitations of our findings.
+The present project investigated symptom–diagnosis associations, diagnostic comorbidity, and symptom-count thresholds using a synthetic mental health dataset. By combining statistical analyses, rule-based classification, and visualisations, the project demonstrated how computational methods can be used to explore relationships between psychiatric symptoms and diagnostic outcomes. However, the findings must be interpreted within the context of the dataset's predefined classification rules rather than as empirical evidence concerning psychiatric disorders.
+
+## Symptom–diagnosis associations
+
+Following false discovery rate (FDR) correction, 37 of the 53 symptom variables showed statistically significant associations with their corresponding diagnoses, whereas none of the 212 cross-disorder comparisons reached statistical significance. These findings are consistent with the dataset's structure, in which each diagnostic indicator is determined by its associated symptom variables. Consequently, the within-disorder associations are partly inherent to the classification process rather than independently discovered relationships.
+
+The absence of statistically significant cross-disorder associations may similarly reflect how the synthetic dataset was generated. In clinical populations, psychiatric disorders frequently share symptoms, risk factors, and underlying mechanisms (Caspi & Moffitt, 2018). Therefore, the present findings should not be interpreted as evidence that psychiatric symptoms are disorder-specific or that transdiagnostic processes are absent.
+
+Notably, the 16 within-disorder comparisons that did not reach statistical significance involved PTSD-related variables. This finding illustrates how the relationship between an individual symptom and an overall diagnostic classification depends on the structure of the classification rule. PTSD requires the simultaneous satisfaction of several criteria, meaning that the presence of an individual symptom may be insufficient to predict the final diagnosis when other necessary conditions are unmet.
+
+## Diagnostic comorbidity
+
+The analyses found no statistically significant associations between the ten pairs of diagnoses after FDR correction (all adjusted *p* values above .31). The observed co-occurrence frequencies were generally close to those expected under statistical independence.
+
+However, the absence of statistically significant results does not establish that the diagnoses are independent. Rather, the analyses did not provide sufficient evidence to reject independence within this dataset (Altman & Bland, 1995). Furthermore, the synthetic nature of the data limits the applicability of these findings to clinical populations, where psychiatric comorbidity is well documented (Kessler et al., 2005). Such comorbidity may reflect shared vulnerabilities, overlapping symptoms, or common underlying psychopathological processes (Caspi & Moffitt, 2018).
+
+## Symptom counts and diagnostic thresholds
+
+The symptom-count visualisations demonstrated how different classification rules produce distinct patterns. Bipolar disorder and depression displayed sharp increases in diagnostic classification at their respective symptom-count thresholds. In contrast, anxiety and schizophrenia showed more gradual patterns because classification additionally depended on duration or specific symptom requirements.
+
+These findings illustrate that diagnostic classification cannot always be reduced to the total number of symptoms. The presence of particular symptoms, combinations of criteria, and additional conditions can be equally important. The successful reconstruction of diagnostic labels across all 3,753 records further demonstrated that the implemented functions consistently reproduce the dataset's predefined rules. Nevertheless, agreement with these rules should not be confused with clinical diagnostic validity.
+
+## Limitations and future directions
+
+The principal limitation of this project is its reliance on synthetic data. Because the diagnostic indicators are generated through predetermined rules, the findings primarily demonstrate the consequences of those rules rather than naturally occurring psychopathological relationships. Moreover, binary symptom coding does not capture clinically relevant differences in symptom severity, frequency, or functional impairment beyond the limited criteria explicitly represented in the dataset.
+
+A further limitation concerns the interpretation of statistical significance. Although multiple-testing correction reduces the risk of false-positive findings, nonsignificant results do not demonstrate the absence of associations (Altman & Bland, 1995). Consequently, the present results should be interpreted as illustrations of the dataset's computational properties rather than as evidence about clinical populations.
+
+Future developments could incorporate more realistic symptom distributions, correlated risk factors, and overlapping diagnostic presentations. The interactive Shiny application could also be extended to allow users to modify individual symptom profiles and observe how diagnostic classifications change under fixed rules. Such functionality would provide a more intuitive demonstration of the computational mechanisms underlying classification.
+
+Overall, the project illustrates the value of reproducible programming, statistical validation, and interactive visualisation for understanding rule-based diagnostic systems, while highlighting the importance of distinguishing computational demonstrations from clinically generalisable findings.
 
 # References
 
-Dataset and literature references will be added here.
-  
+Altman, D. G., & Bland, J. M. (1995). Statistics notes: Absence of evidence is not evidence of absence. *BMJ, 311*(7003), 485. https://doi.org/10.1136/bmj.311.7003.485
+
+Caspi, A., & Moffitt, T. E. (2018). All for one and one for all: Mental disorders in one dimension. *American Journal of Psychiatry, 175*(9), 831–844. https://doi.org/10.1176/appi.ajp.2018.17121383
+
+Karanbakshi1. (n.d.). *Mental illness dataset* [Data set]. Kaggle. https://www.kaggle.com/datasets/karanbakshi1/mental-illness-dataset
+
+Kessler, R. C., Chiu, W. T., Demler, O., Merikangas, K. R., & Walters, E. E. (2005). Prevalence, severity, and comorbidity of 12-month DSM-IV disorders in the National Comorbidity Survey Replication. *Archives of General Psychiatry, 62*(6), 617–627. https://doi.org/10.1001/archpsyc.62.6.617

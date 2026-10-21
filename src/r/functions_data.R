@@ -23,8 +23,11 @@
 
 check_binary <- function(dataset, columns) {
   for (col in columns) {
+    if (!(col %in% names(dataset))) {
+      stop("Missing column: ", col)
+    }
     if (!all(dataset[[col]] %in% c(0, 1))) {
-      stop("Column '", col, "' contains values other than 0 or 1.")
+      stop("Column", col, "contains values other than 0 or 1.")
     }
   }
   message("Check passed: all ", length(columns), " columns contain only 0 and 1.")

@@ -122,15 +122,21 @@ Keep the project directory structure intact because the scripts use relative fil
 
 ### 3. Install dependencies
 
-The project uses R, R Markdown, and Shiny, together with packages required by the statistical analyses and plots.
+The project requires R and the following packages:
 
-For the document and interactive component:
+- `dplyr` — Data manipulation
+- `ggplot2` — Data visualisation
+- `shiny` — Interactive Shiny application
+- `rmarkdown` — HTML report generation
+- `knitr` — R Markdown code execution and tables
+
+Install them in RStudio by running:
 
 ```r
-install.packages(c("rmarkdown", "knitr", "shiny"))
+install.packages(c("dplyr", "ggplot2", "shiny", "rmarkdown", "knitr"))
 ```
 
-Additional analysis and plotting dependencies should be verified against the source scripts and documented before final submission.
+The `stats`, `tools`, and `utils` packages are included with R and do not require separate installation.
 
 ## Running the statistical report
 
@@ -142,17 +148,21 @@ The document includes dataset information, diagnostic rule verification, statist
 
 ## Running the Shiny application
 
-1. Open `PIPS-group-project.Rproj` in RStudio.
-2. Ensure the `shiny`, `rmarkdown`, and `knitr` packages are installed.
-3. Open `Shiny_Sim.Rmd`.
-4. Run the document's setup and application code to launch the Shiny interface.
+Open PIPS-group-project.Rproj in RStudio.
 
-The current prototype allows users to select a dataset row and explore its recorded psychiatric symptoms and diagnostic labels.
+Install the required packages if they are not already available.
 
-**Current limitation:** Changing individual symptom selections does not yet recalculate diagnostic classifications. The application currently presents the original diagnostic labels determined by the project's predefined classification rules.
+Open Shiny_Sim.Rmd.
 
-The simulation is intended for educational purposes and should not be used for clinical assessment.
+Execute the setup and application code in RStudio to initialise the dataset and construct the Shiny application.
 
+Launch the returned Shiny application using RStudio.
+
+The application allows users to select a dataset row and inspect its symptom profile, original diagnostic classifications, and associated DSM-style criteria.
+
+***Current prototype limitation:*** Symptom checkboxes can be toggled, but the displayed diagnoses do not yet recalculate in response to these changes. This functionality is planned for a subsequent update.
+
+The application is intended for educational exploration of synthetic data and should not be used for clinical diagnosis.
 ## Running the tests
 
 Preliminary project and data checks can be run from the project directory:
