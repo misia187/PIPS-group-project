@@ -3,7 +3,7 @@
 title: "Exploring Symptom Patterns and Diagnostic Classification"
 subtitle: "A Computational Analysis of Synthetic Mental Health Data"
 author: "PIPS Group: Tess, Sherilyn, Misia | Programming in Psychological Science"
-date: "2026-10-20"
+date: "2026-10-22"
 output:
   html_document:
     toc: true
@@ -25,11 +25,12 @@ Importantly, the dataset is synthetically generated, and its diagnostic indicato
 
 # Dataset
 
-The dataset was obtained from Kaggle (Karanbakshi1, n.d.).
+The dataset was obtained from Kaggle (Bakshi, n.d.).
 The dataset (Mentalillness.csv, Kaggle) contains 3,753 synthetic participants
 with 53 binary DSM-5 symptoms and criteria (0 = absent, 1 = present) and 5
 binary diagnoses: bipolar disorder, schizophrenia, depression, anxiety
 disorder, and PTSD. It is stored in the `data` folder.
+The dataset was obtained from Kaggle (Bakshi, n.d.) and contains binary indicators representing psychiatric symptoms, diagnostic criteria, and diagnostic classifications. Although these variables are organised around DSM-5 diagnostic categories (American Psychiatric Association, 2013), the dataset implements simplified classification rules rather than reproducing the complete clinical diagnostic framework. Consequently, the observations should be treated as synthetic cases for demonstrating data analysis and computational classification, rather than as clinical patient records.
 
 Because the original column names are long, we first build a variable key that
 gives each column a short name and records which disorder and DSM-5 criterion
@@ -203,6 +204,8 @@ The absence of statistically significant cross-disorder associations may similar
 
 Notably, the 16 within-disorder comparisons that did not reach statistical significance involved PTSD-related variables. This finding illustrates how the relationship between an individual symptom and an overall diagnostic classification depends on the structure of the classification rule. PTSD requires the simultaneous satisfaction of several criteria, meaning that the presence of an individual symptom may be insufficient to predict the final diagnosis when other necessary conditions are unmet.
 
+An additional consideration is the considerable heterogeneity of symptom presentations within the same psychiatric diagnosis. Fried and Nesse (2015) identified 1,030 distinct symptom profiles among 3,703 individuals diagnosed with depression, demonstrating that patients meeting the same diagnostic criteria may nevertheless experience substantially different combinations of symptoms. Similarly, Galatzer-Levy and Bryant (2013) demonstrated that DSM-5 criteria permit 636,120 different PTSD symptom combinations. These findings highlight a limitation of interpreting psychiatric disorders solely through binary diagnostic indicators, which can obscure substantial differences between individuals. In the present synthetic dataset, the simplified classification rules and symptom distributions further restrict the extent to which such clinical heterogeneity can be represented.
+
 ## Diagnostic comorbidity
 
 The analyses found no statistically significant associations between the ten pairs of diagnoses after FDR correction (all adjusted *p* values above .31). The observed co-occurrence frequencies were generally close to those expected under statistical independence.
@@ -217,20 +220,30 @@ These findings illustrate that diagnostic classification cannot always be reduce
 
 ## Limitations and future directions
 
-The principal limitation of this project is its reliance on synthetic data. Because the diagnostic indicators are generated through predetermined rules, the findings primarily demonstrate the consequences of those rules rather than naturally occurring psychopathological relationships. Moreover, binary symptom coding does not capture clinically relevant differences in symptom severity, frequency, or functional impairment beyond the limited criteria explicitly represented in the dataset.
+The principal limitation of this project is its reliance on synthetic data. Because diagnostic classifications are generated using predetermined rules, the statistical findings primarily reflect the dataset's computational structure rather than naturally occurring relationships between psychiatric symptoms and disorders. Consequently, the results cannot be generalised to clinical populations.
 
-A further limitation concerns the interpretation of statistical significance. Although multiple-testing correction reduces the risk of false-positive findings, nonsignificant results do not demonstrate the absence of associations (Altman & Bland, 1995). Consequently, the present results should be interpreted as illustrations of the dataset's computational properties rather than as evidence about clinical populations.
+Furthermore, the classification rules implemented in the dataset do not fully correspond to DSM-5 diagnostic criteria (American Psychiatric Association, 2013). For example, the schizophrenia classification treats the duration indicator as part of the symptom count, whereas DSM-5 distinguishes characteristic symptoms from duration requirements. Similarly, the dataset's PTSD variables do not fully represent the range of symptoms included in DSM-5 Criteria B and D. Although the functions reproduce the classifications provided in the dataset, their successful validation therefore demonstrates computational consistency rather than clinical diagnostic validity.
 
-Future developments could incorporate more realistic symptom distributions, correlated risk factors, and overlapping diagnostic presentations. The interactive Shiny application could also be extended to allow users to modify individual symptom profiles and observe how diagnostic classifications change under fixed rules. Such functionality would provide a more intuitive demonstration of the computational mechanisms underlying classification.
+Another limitation concerns the distribution of symptoms. Many symptom indicators occur in approximately 50% of synthetic observations, producing distributions that do not reflect the variation in symptom prevalence and severity observed in clinical populations. Moreover, the binary coding of symptoms does not adequately capture differences in symptom intensity, frequency, or associated functional impairment. These simplifications may influence the observed associations, diagnostic prevalence, and comorbidity patterns.
 
-Overall, the project illustrates the value of reproducible programming, statistical validation, and interactive visualisation for understanding rule-based diagnostic systems, while highlighting the importance of distinguishing computational demonstrations from clinically generalisable findings.
+The absence of statistically significant associations between different diagnoses should also be interpreted cautiously. Nonsignificant findings do not establish statistical independence (Altman & Bland, 1995). In clinical populations, comorbidity may arise through shared or interacting symptoms, as illustrated by the network perspective proposed by Cramer et al. (2010). Such relationships are not necessarily captured by the present dataset's simplified classification structure.
+
+Future developments could incorporate more realistic symptom frequencies, correlated symptoms across disorders, and more comprehensive representations of diagnostic criteria. Additionally, the Shiny application could allow users to modify individual symptom profiles and observe how diagnostic classifications change under fixed thresholds. Together, these improvements could provide a more informative demonstration of diagnostic complexity while retaining the project's educational and computational objectives.
 
 # References
 
 Altman, D. G., & Bland, J. M. (1995). Statistics notes: Absence of evidence is not evidence of absence. *BMJ, 311*(7003), 485. https://doi.org/10.1136/bmj.311.7003.485
 
+American Psychiatric Association. (2013). *Diagnostic and statistical manual of mental disorders* (5th ed.). https://doi.org/10.1176/appi.books.9780890425596
+
+Bakshi, K. (n.d.). *Mental illness dataset* [Data set]. Kaggle. https://www.kaggle.com/datasets/karanbakshi1/mental-illness-dataset
+
 Caspi, A., & Moffitt, T. E. (2018). All for one and one for all: Mental disorders in one dimension. *American Journal of Psychiatry, 175*(9), 831–844. https://doi.org/10.1176/appi.ajp.2018.17121383
 
-Karanbakshi1. (n.d.). *Mental illness dataset* [Data set]. Kaggle. https://www.kaggle.com/datasets/karanbakshi1/mental-illness-dataset
+Cramer, A. O. J., Waldorp, L. J., van der Maas, H. L. J., & Borsboom, D. (2010). Comorbidity: A network perspective. *Behavioral and Brain Sciences, 33*(2–3), 137–150. https://doi.org/10.1017/S0140525X09991567
+
+Fried, E. I., & Nesse, R. M. (2015). Depression is not a consistent syndrome: An investigation of unique symptom patterns in the STAR*D study. *Journal of Affective Disorders, 172*, 96–102. https://doi.org/10.1016/j.jad.2014.10.010
+
+Galatzer-Levy, I. R., & Bryant, R. A. (2013). 636,120 ways to have posttraumatic stress disorder. *Perspectives on Psychological Science, 8*(6), 651–662. https://doi.org/10.1177/1745691613504115
 
 Kessler, R. C., Chiu, W. T., Demler, O., Merikangas, K. R., & Walters, E. E. (2005). Prevalence, severity, and comorbidity of 12-month DSM-IV disorders in the National Comorbidity Survey Replication. *Archives of General Psychiatry, 62*(6), 617–627. https://doi.org/10.1001/archpsyc.62.6.617
