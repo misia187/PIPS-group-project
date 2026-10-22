@@ -78,11 +78,11 @@ create_shiny_app <- function(dataset, key, dsm_checklists = NULL) {
   rule_columns <- paste0("rule_", disorders)
 
   # Prepare symptom variables from the variable key.
-  symptom_key <- key[
-    !duplicated(as.character(key$name)),
-    c("name", "disorder", "criterion"),
-    drop = FALSE
-  ]
+symptom_key <- key[
+  !duplicated(as.character(key$name)),
+  c("name", "original", "disorder", "criterion"),
+  drop = FALSE
+]
 
   symptom_key$name <- as.character(symptom_key$name)
   symptom_key$disorder <- tolower(as.character(symptom_key$disorder))
@@ -372,17 +372,22 @@ create_shiny_app <- function(dataset, key, dsm_checklists = NULL) {
           }
 
           .diagnosis-present {
-            color: #1855a3;
-            background: #edf4ff;
-            border: 1px solid #bfd5f4;
-          }
+color:#1855a3;
+  background-color:#edf4ff;
+  border:1px solid #bfd5f4;
+}
 
-          .diagnosis-absent,
-          .diagnosis-unknown {
-            color: #505967;
-            background: #eff1f4;
-            border: 1px solid #d3d8df;
-          }
+.diagnosis-absent {
+color:#aa182c;
+  background-color:#fff0f2;
+  border:1px solid #edbec7;
+}
+
+.diagnosis-unknown {
+color:#505967;
+  background-color:#eff1f4;
+  border:1px solid #d3d8df;
+}
 
           .symptom-disorder {
             margin: 18px 0 8px;
@@ -395,79 +400,54 @@ create_shiny_app <- function(dataset, key, dsm_checklists = NULL) {
           }
 
           .symptom-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(115px, 1fr));
-            gap: 12px;
-          }
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-          .symptom-card {
-            min-height: 130px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 12px 8px;
-            background: #fff;
-            border: 1px solid #dce3ec;
-            border-radius: 12px;
-          }
+.symptom-card {
+  min-height: auto;
+  padding: 12px 16px;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
 
-          .symptom-card .checkbox {
-            margin: 0;
-            text-align: center;
-          }
+.symptom-card .checkbox {
+  width: 100%;
+  margin: 0;
+  text-align: left;
+}
 
-          .symptom-card .checkbox label {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 9px;
-            font-weight: 500;
-            color: #24364b;
-            white-space: normal;
-          }
+.symptom-card .checkbox label {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 14px;
+  padding-left: 0;
+  width: 100%;
+  text-align: left;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
 
-          /* Style checkboxes as circular symptom buttons. */
-          .symptom-card input[type='checkbox'] {
-            appearance: none;
-            -webkit-appearance: none;
-            width: 52px;
-            height: 52px;
-            margin: 0;
-            border: 2px solid #c6ced8;
-            border-radius: 50%;
-            background: #fff;
-            cursor: pointer;
-            position: relative;
-            flex: 0 0 auto;
-          }
+.symptom-card input[type='checkbox'] {
+  position: relative;
+  margin: 0;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 34px;
+}
 
-          .symptom-card input[type='checkbox']:checked {
-            background: #dce9f6;
-            border-color: #527aa5;
-          }
+.symptom-card input[type='checkbox']:checked::after {
+  font-size: 20px;
+}
 
-          .symptom-card input[type='checkbox']:checked::after {
-            content: '✓';
-            position: absolute;
-            inset: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #315f8c;
-            font-size: 25px;
-            font-weight: 700;
-          }
-
-          .symptom-card input[type='checkbox']:focus-visible {
-            outline: 3px solid #8cb7ed;
-            outline-offset: 3px;
-          }
-
-          .symptom-card input[type='checkbox']:disabled {
-            opacity: .45;
-            cursor: not-allowed;
-          }
+.symptom-note {
+  width: 100%;
+  text-align: left;
+  margin-top: 6px;
+}
 
           .symptom-note {
             color: #64748b;
@@ -516,31 +496,72 @@ create_shiny_app <- function(dataset, key, dsm_checklists = NULL) {
             background: #f5f7fa;
             color: #596575;
           }
+          .reference-panel {
+            padding: 18px;
+            margin-top: 18px;
+            background: #fff;
+            border: 1px solid #dce3ec;
+            border-radius: 12px;
+          }
+
+          .modal-dialog.modal-lg {
+            width: 96vw;
+            max-width: 1400px;
+          }
+
+          .expanded-reference {
+            max-height: 75vh;
+            overflow-y: auto;
+          }
+          .diagnosis-table .diagnosis-status.diagnosis-present {
+color:#1855a3;
+  background-color:#edf4ff;
+  border:1px solid #bfd5f4;
+}
+
+.diagnosis-table .diagnosis-status.diagnosis-absent {
+color:#aa182c;
+  background-color:#fff0f2;
+  border:1px solid #edbec7;
+}
+
+.diagnosis-table .diagnosis-status.diagnosis-unknown {
+color:#505967;
+  background-color:#eff1f4;
+  border:1px solid #d3d8df;
+}
         ")
       )
     ),
 
     shiny::titlePanel(title = "Psychiatric Symptom Profile & Diagnostic Tool Simulation App", windowTitle = "Symptom Explorer"), shiny::tags$p("Welcome! Explore DSM V criteria for Bipolar Disorder, Depression, Anxiety, and PTSD, individual symptom profiles, and simulate alternative diagnostic scenarios. This app is intended as a visual teaching tool for understanding the DSM V diagnostic structure.",
                                                                                                                                                class = "app-subtitle"), 
+shiny::tags$section(
+  class = "reference-panel",
+  shiny::h3("DSM textbook reference"),
+  shiny::p(
+    "Review the sourced criteria for each disorder. ",
+    "Select a disorder to expand its checklist."
+  ),
+  shiny::actionButton("expand_reference", "Open expanded reference view"),
+  shiny::tagList(lapply(seq_along(disorders), function(i) {
+    checklist_section(disorders[i], disorder_labels[i])
+  }))
+), shiny::hr(), 
 
     shiny::sidebarLayout(
 
       shiny::sidebarPanel(
         shiny::selectizeInput(
           "participant",
-          "Select dataset row",
+          "Select an example profile",
           choices = as.character(seq_len(nrow(app_data))),
           selected = "1"
-        ),
-
-        shiny::helpText(
-          "Row numbers identify positions in the loaded dataset, ",
-          "not clinical participant identifiers."
-        ),
+        ), 
         
         shiny::hr(),
 
-        shiny::h4("Diagnosis labels"),
+        shiny::h4("Diagnosis"),
 
         shiny::textOutput("selected_row"),
 
@@ -549,31 +570,10 @@ create_shiny_app <- function(dataset, key, dsm_checklists = NULL) {
         shiny::hr(),
 
         shiny::helpText(
-          "This version displays the original symptom profile's rebuilt labels. ",
-          "It does not edit symptoms or rule thresholds."
+          "Symptom controls are a visual prototype. Toggling them does not save ",
+          "changes or recalculate diagnosis labels."
         )
-      ),
-
-      shiny::mainPanel(
-
-        shiny::h3("Symptom profile"),
-
-        
-        shiny::h3("DSM textbook reference"),
-
-        shiny::p(
-          "Review the criteria for each disorder before exploring ",
-          "the corresponding symptoms. Select a disorder to expand ",
-          "its checklist."
-        ),
-
-        shiny::tagList(
-          lapply(seq_along(disorders), function(i) {
-            checklist_section(disorders[i], disorder_labels[i])
-          })
-        ),
-
-        shiny::hr(),
+      ), shiny::mainPanel(
 
         shiny::h3("Symptom profile"),
 
@@ -591,14 +591,12 @@ create_shiny_app <- function(dataset, key, dsm_checklists = NULL) {
         shiny::h4("Interpretation"),
 
         shiny::p(
-          "Present (red) means 1; absent (blue) means 0. ",
-          "Missing labels are shown as unknown (grey), not absent."
+           "Present (blue) means 1; absent (red) means 0. ",
+  "Missing labels are shown as unknown (grey), not absent."
         ),
 
         shiny::p(
-          "The labels reflect the dataset's implemented DSM-style rules, ",
-          "not a full clinical assessment. Reference checklists do not ",
-          "automatically change these labels."
+          "Educational use only. Displayed labels are calculated using the ", "dataset's implemented DSM-style rules, which may differ from full ", "DSM criteria. The DSM reference is provided separately for comparison; ", "these labels are not clinical diagnoses."
         ),
 
         shiny::p(
@@ -611,6 +609,25 @@ create_shiny_app <- function(dataset, key, dsm_checklists = NULL) {
 
   # Define how the app responds to the selected dataset row.
   server <- function(input, output, session) {
+    
+    shiny::observeEvent(input$expand_reference, {
+  shiny::showModal(
+    shiny::modalDialog(
+      title = "DSM textbook reference",
+      size = "l",
+      easyClose = TRUE,
+      footer = shiny::modalButton("Close"),
+      shiny::tags$div(
+        class = "expanded-reference",
+        shiny::tagList(
+          lapply(seq_along(disorders), function(i) {
+            checklist_section(disorders[i], disorder_labels[i])
+          })
+        )
+      )
+    )
+  )
+})
 
     # Retrieve the selected row from the rebuilt dataset.
     original_profile <- shiny::reactive({
@@ -677,7 +694,7 @@ create_shiny_app <- function(dataset, key, dsm_checklists = NULL) {
 
               shiny::checkboxInput(
                 inputId = input_id,
-                label = symptom_label(column_name),
+                label = as.character(symptom_key$original[i]),
                 value = !missing_value && as.numeric(value) == 1,
                 width = "100%"
               ),
@@ -726,7 +743,7 @@ create_shiny_app <- function(dataset, key, dsm_checklists = NULL) {
     # Display which row is currently selected.
     output$selected_row <- shiny::renderText({
       original_profile()
-      paste("Selected dataset row:", input$participant)
+      paste("Selected example profile:", input$participant)
     })
 
     # Show the rebuilt diagnosis labels with styled status indicators.
@@ -798,4 +815,8 @@ create_shiny_app <- function(dataset, key, dsm_checklists = NULL) {
 
 ```
 
+```{r}
+app <- create_shiny_app(clindata, variable_key)
+shiny::runApp(app)
+```
 
