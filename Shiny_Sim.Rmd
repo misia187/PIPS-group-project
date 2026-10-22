@@ -43,265 +43,503 @@ cat("All five rebuilt diagnosis-label columns are available.\n")
 ```
 ```{r}
 # File: src/r/functions_shiny.R
-# Purpose: Explore symptom profiles, diagnosis labels, and DSM references.
-#
-# The symptom circles are currently a UI prototype. Toggling them does not
-# yet recalculate diagnosis labels; that behaviour will be added later.
-# DSM checklist text is reference-only and does not change the rules.
-# Sourcing this file defines the function but does not launch the app.
+# Purpose: Explore symptom profiles, simulate dataset-rule labels,
+# and display separate DSM reference information.
+# Changes are temporary; the original dataset is not modified.
+# Sourcing this file defines the function without launching the app.
 
 create_shiny_app <- function(dataset, key, dsm_checklists = NULL) {
-
   if (!requireNamespace("shiny", quietly = TRUE)) {
     stop("Install Shiny first: install.packages('shiny').")
   }
-
   if (!is.data.frame(dataset) || nrow(dataset) == 0L) {
     stop("dataset must be a nonempty data frame.")
   }
-
   if (!is.data.frame(key) ||
-      !all(c("name", "disorder", "criterion") %in% names(key))) {
-    stop("key must be a data frame with name, disorder, and criterion columns.")
+      !all(c("name", "original", "disorder", "criterion") %in% names(key))) {
+    stop("key must have name, original, disorder, and criterion columns.")
   }
-
   if (!exists("apply_dsm_rules", mode = "function") ||
       !exists("default_thresholds")) {
     stop("Source src/r/functions_dsm_rules.R before creating the app.")
   }
 
   disorders <- c("bipolar", "depression", "anxiety", "schizophrenia", "ptsd")
-  disorder_labels <- c(
-    "Bipolar", "Depression", "Anxiety", "Schizophrenia", "PTSD"
-  )
+  disorder_labels <- c("Bipolar", "Depression", "Anxiety", "Schizophrenia", "PTSD")
   diagnosis_columns <- paste0("dx_", disorders)
   rule_columns <- paste0("rule_", disorders)
 
-  # Prepare symptom variables from the variable key.
-symptom_key <- key[
-  !duplicated(as.character(key$name)),
-  c("name", "original", "disorder", "criterion"),
-  drop = FALSE
-]
-
+  symptom_key <- key[
+    !duplicated(as.character(key$name)),
+    c("name", "original", "disorder", "criterion"),
+    drop = FALSE
+  ]
   symptom_key$name <- as.character(symptom_key$name)
   symptom_key$disorder <- tolower(as.character(symptom_key$disorder))
   symptom_key$criterion <- as.character(symptom_key$criterion)
-
   symptom_key <- symptom_key[
-    symptom_key$disorder %in% disorders,
-    ,
-    drop = FALSE
+    !is.na(symptom_key$disorder) &
+      symptom_key$disorder %in% disorders &
+      !is.na(symptom_key$criterion) &
+      tolower(trimws(symptom_key$criterion)) != "diagnosis" &
+      !(symptom_key$name %in% diagnosis_columns),
+    , drop = FALSE
   ]
 
-  # Convert variable names such as "sleep_change" to readable labels.
-  symptom_label <- function(x) {
-    x <- gsub("_+", " ", x)
-    x <- gsub("\\.", " ", x)
-    tools::toTitleCase(trimws(x))
-  }
-
-  # Check that the symptom and original diagnosis columns exist.
   required_columns <- unique(c(as.character(key$name), diagnosis_columns))
   missing_columns <- setdiff(required_columns, names(dataset))
-
   if (length(missing_columns) > 0L) {
-    stop(
-      "Missing dataset columns: ",
-      paste(missing_columns, collapse = ", ")
-    )
+    stop("Missing dataset columns: ", paste(missing_columns, collapse = ", "))
   }
-
-  # Symptoms and original diagnosis columns must contain 0, 1, or NA.
   is_binary <- function(values) {
     (is.numeric(values) || is.logical(values)) &&
       all(is.na(values) | values %in% c(0, 1))
   }
-
-  valid_binary <- vapply(
-    dataset[, required_columns, drop = FALSE],
-    is_binary,
-    logical(1)
-  )
-
+  valid_binary <- vapply(dataset[, required_columns, drop = FALSE], is_binary, logical(1))
   if (!all(valid_binary)) {
-    stop(
-      "Expected numeric/logical 0/1 values in: ",
-      paste(names(valid_binary)[!valid_binary], collapse = ", ")
-    )
+    stop("Expected numeric/logical 0/1 values in: ",
+         paste(names(valid_binary)[!valid_binary], collapse = ", "))
   }
-
-  # Rebuild diagnosis labels using the project's default DSM-style rules.
-  app_data <- apply_dsm_rules(
-    dataset,
-    key,
-    thresholds = default_thresholds
-  )
-
+  app_data <- apply_dsm_rules(dataset, key, thresholds = default_thresholds)
   if (!all(rule_columns %in% names(app_data))) {
     stop("apply_dsm_rules() did not return all five rule_* columns.")
   }
-
-  valid_rules <- vapply(
-    app_data[, rule_columns, drop = FALSE],
-    is_binary,
-    logical(1)
-  )
-
+  valid_rules <- vapply(app_data[, rule_columns, drop = FALSE], is_binary, logical(1))
   if (!all(valid_rules)) {
     stop("Expected numeric/logical 0/1 values in rebuilt diagnosis columns.")
   }
 
-  
-  # Prepare optional DSM checklist reference material.
-  # Each disorder entry can contain:
-  # edition, source_title, source_url, and criteria.
-
+  # Default references are the supplied text, not independently verified.
+  # Source URLs were not supplied. Confirm sources and permissions before publishing.
+  # Reference information does not change the simulation's counting rules.
   if (is.null(dsm_checklists)) {
-    dsm_checklists <- list()
+    reference_source <- paste(
+      "Diagnostic and Statistical Manual of Mental Disorders, Fifth Edition",
+      "(DSM-5); supplied text attributed to this source"
+    )
+    dsm_checklists <- list(
+      bipolar = list(
+        edition = "DSM-5 (as identified in supplied text)",
+        source_title = reference_source,
+        source_url = "",
+        criteria = "Bipolar II Disorder Diagnostic Criteria (DSM-5)
+
+For a diagnosis of bipolar II disorder, it is necessary to meet the following criteria for a current or past hypomanic episode and the following criteria for a current or past major depressive episode:
+
+Hypomanic Episode
+
+A distinct period of abnormally and persistently elevated, expansive, or irritable mood and abnormally and persistently increased activity or energy, lasting at least 4 consecutive days and present most of the day, nearly every day.
+
+During the period of mood disturbance and increased energy and activity, three (or more) of the following symptoms have persisted (four if the mood is only irritable), represent a noticeable change from usual behavior, and have been present to a significant degree:
+• Inflated self-esteem or grandiosity.
+• Decreased need for sleep (e.g., feels rested after only 3 hours of sleep).
+• More talkative than usual or pressure to keep talking.
+• Flight of ideas or subjective experience that thoughts are racing.
+• Distractibility (i.e., attention too easily drawn to unimportant or irrelevant external stimuli), as reported or observed.
+• Increase in goal-directed activity (either socially, at work or school, or sexually) or psychomotor agitation.
+• Excessive involvement in activities that have a high potential for painful consequences (e.g., engaging in unrestrained buying sprees, sexual indiscretions, or foolish business investments).
+
+The episode is associated with an unequivocal change in functioning that is uncharacteristic of the individual when not symptomatic.
+
+The disturbance in mood and the change in functioning are observable by others.
+
+The episode is not severe enough to cause marked impairment in social or occupational functioning or to necessitate hospitalization. If there are psychotic features, the episode is, by definition, manic.
+
+The episode is not attributable to the physiological effects of a substance (e.g., a drug of abuse, a medication, other treatment) or another medical condition.
+
+Note: A full hypomanic episode that emerges during antidepressant treatment (e.g., medication, electroconvulsive therapy) but persists at a fully syndromal level beyond the physiological effect of that treatment is sufficient evidence for a hypomanic episode diagnosis. However, caution is indicated so that one or two symptoms (particularly increased irritability, edginess, or agitation following antidepressant use) are not taken as sufficient for diagnosis of a hypomanic episode, nor necessarily indicative of a bipolar diathesis.
+
+Major Depressive Episode
+
+Five (or more) of the following symptoms have been present during the same 2-week period and represent a change from previous functioning; at least one of the symptoms is either (1) depressed mood or (2) loss of interest or pleasure.
+
+Note: Do not include symptoms that are clearly attributable to a medical condition.
+
+• Depressed mood most of the day, nearly every day, as indicated by either subjective report (e.g., feels sad, empty, or hopeless) or observation made by others (e.g., appears tearful). (Note: In children and adolescents, can be irritable mood.)
+• Markedly diminished interest or pleasure in all, or almost all, activities most of the day, nearly every day (as indicated by either subjective account or observation).
+• Significant weight loss when not dieting or weight gain (e.g., a change of more than 5% of body weight in a month), or decrease or increase in appetite nearly every day. (Note: In children, consider failure to make expected weight gain.)
+• Insomnia or hypersomnia nearly every day.
+• Psychomotor agitation or retardation nearly every day (observable by others; not merely subjective feelings of restlessness or being slowed down).
+• Fatigue or loss of energy nearly every day.
+• Feelings of worthlessness or excessive or inappropriate guilt (which may be delusional) nearly every day (not merely self-reproach or guilt about being sick).
+• Diminished ability to think or concentrate, or indecisiveness, nearly every day (either by subjective account or as observed by others).
+• Recurrent thoughts of death (not just fear of dying), recurrent suicidal ideation without a specific plan, a suicide attempt, or a specific plan for committing suicide.
+
+The symptoms cause clinically significant distress or impairment in social, occupational, or other important areas of functioning.
+
+The episode is not attributable to the physiological effects of a substance or another medical condition.
+
+Note: Criteria A–C above constitute a major depressive episode.
+
+Note: Responses to a significant loss (e.g., bereavement, financial ruin, losses from a natural disaster, a serious medical illness or disability) may include the feelings of intense sadness, rumination about the loss, insomnia, poor appetite, and weight loss noted in Criterion A, which may resemble a depressive episode. Although such symptoms may be understandable or considered appropriate to the loss, the presence of a major depressive episode in addition to the normal response to a significant loss should be carefully considered. This decision inevitably requires the exercise of clinical judgment based on the individual’s history and the cultural norms for the expression of distress in the context of loss.
+
+Bipolar II Disorder
+
+Criteria have been met for at least one hypomanic episode (Criteria A–F under ‘Hypomanic Episode’ above) and at least one major depressive episode (Criteria A–C under ‘Major Depressive Episode’ above).
+
+There has never been a manic episode.
+
+The occurrence of the hypomanic episode(s) and major depressive episode(s) is not better explained by schizoaffective disorder, schizophrenia, schizophreniform disorder, delusional disorder, or other specified or unspecified schizophrenia spectrum and other psychotic disorder.
+
+The symptoms of depression or the unpredictability caused by frequent alternation between periods of depression and hypomania causes clinically significant distress or impairment in social, occupational, or other important areas of functioning.
+
+Coding and Recording Procedures
+
+Bipolar II disorder has one diagnostic code: 296.89 (F31.81). Its status with respect to current severity, presence of psychotic features, course, and other specifiers cannot be coded but should be indicated in writing (e.g., 296.89 [F31.81] bipolar II disorder, current episode depressed, moderate severity, with mixed features; 296.89 [F31.81] bipolar II disorder, most recent episode depressed, in partial remission).
+
+Specify current or most recent episode:
+• Hypomanic
+• Depressed
+
+Specify if:
+• With anxious distress (p. 149)
+• With mixed features (pp. 149–150)
+• With rapid cycling (pp. 150–151)
+• With melancholic features (p. 151)
+• With atypical features (pp. 151–152)
+• With mood-congruent psychotic features (p. 152)
+• With mood-incongruent psychotic features (p. 152)
+• With catatonia (p. 152). Coding note: Use additional code 293.89 (F06.1).
+• With peripartum onset (pp. 152–153)
+• With seasonal pattern (pp. 153–154).
+
+Specify course if full criteria for a mood episode are not currently met:
+• In partial remission (p. 154)
+• In full remission (p. 154)
+
+Specify severity if full criteria for a major depressive episode are currently met:
+• Mild (p. 154)
+• Moderate (p. 154)
+• Severe (p. 154)"
+      ),
+      depression = list(
+        edition = "DSM-5 (as identified in supplied text)",
+        source_title = reference_source,
+        source_url = "",
+        criteria = "Major Depressive Disorder Diagnostic Criteria (DSM-5)
+
+Five (or more) of the following symptoms have been present during the same 2-week period and represent a change from previous functioning; at least one of the symptoms is either (1) depressed mood or (2) loss of interest or pleasure.
+
+Note: Do not include symptoms that are clearly attributable to another medical condition.
+
+• Depressed mood most of the day, nearly every day, as indicated by either subjective report (e.g., feels sad, empty, hopeless) or observation made by others (e.g., appears tearful). (Note: In children and adolescents, can be irritable mood.)
+• Markedly diminished interest or pleasure in all, or almost all, activities most of the day, nearly every day (as indicated by either subjective account or observation).
+• Significant weight loss when not dieting or weight gain (e.g., a change of more than 5% of body weight in a month), or decrease or increase in appetite nearly every day. (Note: In children, consider failure to make expected weight gain.)
+• Insomnia or hypersomnia nearly every day.
+• Psychomotor agitation or retardation nearly every day (observable by others, not merely subjective feelings of restlessness or being slowed down).
+• Fatigue or loss of energy nearly every day.
+• Feelings of worthlessness or excessive or inappropriate guilt (which may be delusional) nearly every day (not merely self-reproach or guilt about being sick).
+• Diminished ability to think or concentrate, or indecisiveness, nearly every day (either by subjective account or as observed by others).
+• Recurrent thoughts of death (not just fear of dying), recurrent suicidal ideation without a specific plan, or a suicide attempt or a specific plan for committing suicide.
+
+The symptoms cause clinically significant distress or impairment in social, occupational, or other important areas of functioning.
+
+The episode is not attributable to the physiological effects of a substance or another medical condition.
+
+Note: Criteria A–C represent a major depressive episode.
+
+Note: Responses to a significant loss (e.g., bereavement, financial ruin, losses from a natural disaster, a serious medical illness or disability) may include the feelings of intense sadness, rumination about the loss, insomnia, poor appetite, and weight loss noted in Criterion A, which may resemble a depressive episode. Although such symptoms may be understandable or considered appropriate to the loss, the presence of a major depressive episode in addition to the normal response to a significant loss should also be carefully considered. This decision inevitably requires the exercise of clinical judgment based on the individual’s history and the cultural norms for the expression of distress in the context of loss.
+
+The occurrence of the major depressive episode is not better explained by schizoaffective disorder, schizophrenia, schizophreniform disorder, delusional disorder, or other specified and unspecified schizophrenia spectrum and other psychotic disorders.
+
+There has never been a manic episode or a hypomanic episode. Note: This exclusion does not apply if all of the manic-like or hypomanic-like episodes are substance-induced or are attributable to the physiological effects of another medical condition.
+
+Coding and Recording Procedures
+
+The diagnostic code for major depressive disorder is based on whether this is a single or recurrent episode, current severity, presence of psychotic features, and remission status. Current severity and psychotic features are only indicated if full criteria are currently met for a major depressive episode. Remission specifiers are only indicated if the full criteria are not currently met for a major depressive episode.
+
+In recording the name of a diagnosis, terms should be listed in the following order: major depressive disorder, single or recurrent episode, severity/psychotic/remission specifiers, followed by as many of the following specifiers without codes that apply to the current episode.
+
+Specify:
+• With anxious distress (p. 184)
+• With mixed features (pp. 184–185)
+• With melancholic features (p. 185)
+• With atypical features (pp. 185–186)
+• With mood-congruent psychotic features (p. 186)
+• With mood-incongruent psychotic features (p. 186)
+• With catatonia (p. 186). Coding note: Use additional code 293.89 (F06.1).
+• With peripartum onset (pp. 186–187)
+• With seasonal pattern (recurrent episode only) (pp. 187–188)"
+      ),
+      anxiety = list(
+        edition = "DSM-5 (as identified in supplied text)",
+        source_title = reference_source,
+        source_url = "",
+        criteria = "Generalized Anxiety Disorder Diagnostic Criteria (DSM-5)
+
+Excessive anxiety and worry (apprehensive expectation), occurring more days than not for at least 6 months, about a number of events or activities (such as work or school performance).
+
+The individual finds it difficult to control the worry.
+
+The anxiety and worry are associated with three (or more) of the following six symptoms (with at least some symptoms having been present for more days than not for the past 6 months):
+
+Note: Only one item is required in children.
+
+• Restlessness or feeling keyed up or on edge.
+• Being easily fatigued.
+• Difficulty concentrating or mind going blank.
+• Irritability.
+• Muscle tension.
+• Sleep disturbance (difficulty falling or staying asleep, or restless, unsatisfying sleep).
+
+The anxiety, worry, or physical symptoms cause clinically significant distress or impairment in social, occupational, or other important areas of functioning.
+
+The disturbance is not attributable to the physiological effects of a substance (e.g., a drug of abuse, a medication) or another medical condition (e.g., hyperthyroidism).
+
+The disturbance is not better explained by another mental disorder (e.g., anxiety or worry about having panic attacks in panic disorder, negative evaluation in social anxiety disorder [social phobia], contamination or other obsessions in obsessive-compulsive disorder, separation from attachment figures in separation anxiety disorder, reminders of traumatic events in posttraumatic stress disorder, gaining weight in anorexia nervosa, physical complaints in somatic symptom disorder, perceived appearance flaws in body dysmorphic disorder, having a serious illness in illness anxiety disorder, or the content of delusional beliefs in schizophrenia or delusional disorder)."
+      ),
+      schizophrenia = list(
+        edition = "DSM-5 (as identified in supplied text)",
+        source_title = reference_source,
+        source_url = "",
+        criteria = "Schizophrenia Diagnostic Criteria (DSM-5)
+
+Two (or more) of the following, each present for a significant portion of time during a 1-month period (or less if successfully treated). At least one of these must be (1), (2), or (3):
+
+1. Delusions.
+2. Hallucinations.
+3. Disorganized speech (e.g., frequent derailment or incoherence).
+4. Grossly disorganized or catatonic behavior.
+5. Negative symptoms (i.e., diminished emotional expression or avolition).
+
+For a significant portion of the time since the onset of the disturbance, level of functioning in one or more major areas, such as work, interpersonal relations, or self-care, is markedly below the level achieved prior to the onset (or when the onset is in childhood or adolescence, there is failure to achieve expected level of interpersonal, academic, or occupational functioning).
+
+Continuous signs of the disturbance persist for at least 6 months. This 6-month period must include at least 1 month of symptoms (or less if successfully treated) that meet Criterion A (i.e., active-phase symptoms) and may include periods of prodromal or residual symptoms. During these prodromal or residual periods, the signs of the disturbance may be manifested by only negative symptoms or by two or more symptoms listed in Criterion A present in an attenuated form (e.g., odd beliefs, unusual perceptual experiences).
+
+Schizoaffective disorder and depressive or bipolar disorder with psychotic features have been ruled out because either 1) no major depressive or manic episodes have occurred concurrently with the active-phase symptoms, or 2) if mood episodes have occurred during active-phase symptoms, they have been present for a minority of the total duration of the active and residual periods of the illness.
+
+The disturbance is not attributable to the physiological effects of a substance (e.g., a drug of abuse, a medication) or another medical condition.
+
+If there is a history of autism spectrum disorder or a communication disorder of childhood onset, the additional diagnosis of schizophrenia is made only if prominent delusions or hallucinations, in addition to the other required symptoms of schizophrenia, are also present for at least 1 month (or less if successfully treated).
+
+Specify if:
+
+The following course specifiers are only to be used after a 1-year duration of the disorder and if they are not in contradiction to the diagnostic course criteria.
+
+First episode, currently in acute episode: First manifestation of the disorder meeting the defining diagnostic symptom and time criteria. An acute episode is a time period in which the symptom criteria are fulfilled.
+
+First episode, currently in partial remission: Partial remission is a period of time during which an improvement after a previous episode is maintained and in which the defining criteria of the disorder are only partially fulfilled.
+
+First episode, currently in full remission: Full remission is a period of time after a previous episode during which no disorder-specific symptoms are present.
+
+Multiple episodes, currently in acute episode: Multiple episodes may be determined after a minimum of two episodes (i.e., after a first episode, a remission and a minimum of one relapse).
+
+Multiple episodes, currently in partial remission
+
+Multiple episodes, currently in full remission
+
+Continuous: Symptoms fulfilling the diagnostic symptom criteria of the disorder are remaining for the majority of the illness course, with subthreshold symptom periods being very brief relative to the overall course.
+
+Unspecified
+
+Specify if:
+
+With catatonia (refer to the criteria for catatonia associated with another mental disorder, pp. 119–120, for definition).
+
+Coding note: Use additional code 293.89 (F06.1) catatonia associated with schizophrenia to indicate the presence of the comorbid catatonia.
+
+Specify current severity:
+
+Severity is rated by a quantitative assessment of the primary symptoms of psychosis, including delusions, hallucinations, disorganized speech, abnormal psychomotor behavior, and negative symptoms. Each of these symptoms may be rated for its current severity (most severe in the last 7 days) on a 5-point scale ranging from 0 (not present) to 4 (present and severe). (See Clinician-Rated Dimensions of Psychosis Symptom Severity in the chapter ‘Assessment Measures.’)
+
+Note: Diagnosis of schizophrenia can be made without using this severity specifier."
+      ),
+      ptsd = list(
+        edition = "DSM-5 (as identified in supplied text)",
+        source_title = paste(reference_source, "— supplied PTSD summary"),
+        source_url = "",
+        criteria = "Posttraumatic Stress Disorder (PTSD) Diagnostic Criteria (DSM-5)
+
+The following criteria apply to adults, adolescents, and children older than 6 years. Different, developmentally adapted criteria apply to children aged 6 years and younger.
+
+For a diagnosis of posttraumatic stress disorder (PTSD), an individual must have experienced or been exposed to a qualifying traumatic event and meet the required criteria for intrusion symptoms, avoidance, negative alterations in cognition and mood, and changes in arousal and reactivity. Symptoms must persist for more than one month, cause clinically significant distress or impairment, and not be attributable to substances or another medical condition.
+
+Criterion A — Exposure to a Traumatic Event
+
+Exposure to actual or threatened death, serious injury, or sexual violence through one or more of the following:
+
+• Direct exposure: Personally experiencing the traumatic event.
+• Witnessing: Observing the event happening to another person.
+• Learning about a traumatic event: Discovering that a close family member or close friend experienced a traumatic event. If the event involved death or threatened death, it must have been violent or accidental.
+• Repeated or extreme indirect exposure: Repeated exposure to distressing details of traumatic events, such as in certain emergency-response or investigative occupations.
+
+Note: Exposure through television, photographs, films, or electronic media does not ordinarily qualify unless it occurs as part of work-related duties.
+
+Criterion B — Intrusion Symptoms
+
+At least one of the following symptoms must develop after the traumatic event:
+
+• Recurrent, involuntary, and distressing memories of the traumatic event.
+• Repeated distressing dreams related to the traumatic experience.
+• Dissociative reactions, including flashbacks, in which the individual experiences the event as though it were happening again.
+• Intense or prolonged psychological distress when encountering reminders associated with the trauma.
+• Strong physiological reactions to reminders of the traumatic event.
+
+Note: In children, intrusive memories or reenactments may appear through repetitive play. Trauma-related dreams may also lack clearly recognisable content.
+
+Criterion C — Persistent Avoidance
+
+At least one of the following forms of avoidance must occur after the event:
+
+• Avoidance of trauma-related thoughts, memories, or feelings.
+• Avoidance of external reminders, including people, places, activities, conversations, objects, or situations associated with the trauma.
+
+Criterion D — Negative Alterations in Cognitions and Mood
+
+At least two of the following symptoms must begin or worsen after the traumatic event:
+
+• Inability to recall important aspects of the traumatic event, usually because of dissociative amnesia rather than another cause.
+• Persistent and exaggerated negative beliefs about oneself, other people, or the world.
+• Distorted interpretations of the causes or consequences of the trauma, resulting in inappropriate self-blame or blame of others.
+• Persistent negative emotional states, such as fear, anger, guilt, horror, or shame.
+• Markedly diminished interest or participation in previously meaningful activities.
+• Feelings of detachment or estrangement from other people.
+• Persistent inability to experience positive emotions, such as happiness, affection, or satisfaction.
+
+Criterion E — Alterations in Arousal and Reactivity
+
+At least two of the following symptoms must develop or worsen following the traumatic event:
+
+• Irritability or angry outbursts, potentially involving verbal or physical aggression.
+• Reckless or self-destructive behaviour.
+• Hypervigilance or persistently heightened alertness to possible threats.
+• Exaggerated startle responses to unexpected stimuli.
+• Difficulties with attention or concentration.
+• Sleep disturbances, including difficulty falling asleep, staying asleep, or experiencing restful sleep.
+
+Criterion F — Duration
+
+The disturbances described in Criteria B, C, D, and E must persist for more than one month.
+
+Criterion G — Clinically Significant Distress or Impairment
+
+The symptoms must cause clinically significant distress or interfere with important areas of functioning, including occupational, social, interpersonal, or educational functioning.
+
+Criterion H — Exclusion of Other Causes
+
+The symptoms must not be attributable to the physiological effects of substances, medications, or another medical condition.
+
+Posttraumatic Stress Disorder — Diagnostic Requirements
+
+For a PTSD diagnosis, all of the following must be satisfied:
+
+• Criterion A: Qualifying traumatic exposure.
+• Criterion B: At least 1 intrusion symptom.
+• Criterion C: At least 1 avoidance symptom.
+• Criterion D: At least 2 negative cognition or mood symptoms.
+• Criterion E: At least 2 arousal or reactivity symptoms.
+• Criterion F: Symptoms lasting longer than 1 month.
+• Criterion G: Clinically significant distress or impairment.
+• Criterion H: Symptoms not attributable to substances or another medical condition.
+
+Diagnostic Specifiers
+
+Specify whether:
+
+With dissociative symptoms
+
+The individual meets the diagnostic criteria for PTSD and additionally experiences persistent or recurrent depersonalization, derealization, or both:
+
+• Depersonalization: Experiences of detachment from one's body, thoughts, or mental processes, such as feeling like an outside observer of oneself.
+• Derealization: Experiences in which the surrounding environment feels unreal, distant, dreamlike, or distorted.
+
+Note: Dissociative symptoms must not be explained by substance effects or another medical condition.
+
+Specify if:
+
+With delayed expression
+
+The complete diagnostic criteria are not met until at least six months after the traumatic event, although some symptoms may have appeared earlier.
+
+Developmental Considerations — Children Aged 6 Years and Younger
+
+DSM-5 provides separate diagnostic criteria for children aged 6 years and younger because trauma-related symptoms may be expressed differently during early development.
+
+Important differences include:
+
+• Traumatic exposure: Includes direct exposure, witnessing trauma involving others (particularly caregivers), or learning about trauma affecting a parent or caregiving figure.
+• Intrusion: At least one symptom is required; symptoms may be expressed through repetitive trauma-related play or distressing dreams.
+• Avoidance or negative alterations in cognition and mood: At least one symptom across these combined domains is required.
+• Arousal and reactivity: At least two symptoms are required.
+• Duration: More than one month.
+• Impairment: Clinically significant distress or problems in relationships with caregivers, peers, or school functioning.
+• Exclusion: Symptoms cannot be attributable to substances or another medical condition.
+
+The specifiers with dissociative symptoms and with delayed expression may also apply."
+      )
+    )
   }
 
-  if (!is.list(dsm_checklists)) {
-    stop("dsm_checklists must be a named list.")
-  }
-
+  if (!is.list(dsm_checklists)) stop("dsm_checklists must be a named list.")
   if (length(dsm_checklists) > 0L) {
     checklist_names <- names(dsm_checklists)
-
-    if (is.null(checklist_names) ||
-        anyNA(checklist_names) ||
-        any(!nzchar(checklist_names)) ||
-        anyDuplicated(checklist_names)) {
+    if (is.null(checklist_names) || anyNA(checklist_names) ||
+        any(!nzchar(checklist_names)) || anyDuplicated(checklist_names)) {
       stop("Every checklist entry must have a unique disorder name.")
     }
-
     invalid_names <- setdiff(checklist_names, disorders)
-
     if (length(invalid_names)) {
-      stop(
-        "Unknown checklist names: ",
-        paste(invalid_names, collapse = ", ")
-      )
+      stop("Unknown checklist names: ", paste(invalid_names, collapse = ", "))
     }
   }
-
-  # Read a single optional text field from a checklist entry.
   read_text <- function(entry, field, disorder) {
     value <- entry[[field]]
-
-    if (is.null(value)) {
-      return("")
-    }
-
+    if (is.null(value)) return("")
     if (!is.character(value) || length(value) != 1L || is.na(value)) {
       stop(disorder, "$", field, " must be a single non-missing string.")
     }
-
     trimws(value)
   }
+  checklists <- stats::setNames(lapply(disorders, function(disorder) {
+    entry <- dsm_checklists[[disorder]]
+    if (is.null(entry)) entry <- list()
+    if (!is.list(entry)) stop("Checklist for ", disorder, " must be a list.")
+    edition <- read_text(entry, "edition", disorder)
+    source_title <- read_text(entry, "source_title", disorder)
+    source_url <- read_text(entry, "source_url", disorder)
+    if (nzchar(source_url) &&
+        !grepl("^https?://[^[:space:]]+$", source_url, ignore.case = TRUE)) {
+      stop("Source URL for ", disorder, " must start with http:// or https://.")
+    }
+    criteria <- entry$criteria
+    if (is.null(criteria)) criteria <- character(0)
+    if (!is.character(criteria) || anyNA(criteria)) {
+      stop("Criteria for ", disorder, " must be a character vector without NA.")
+    }
+    criteria <- criteria[nzchar(trimws(criteria))]
+    list(edition = edition, source_title = source_title,
+         source_url = source_url, criteria = criteria)
+  }), disorders)
 
-  # Ensure every disorder has a checklist entry, even if it is empty.
-  checklists <- stats::setNames(
-    lapply(disorders, function(disorder) {
-
-      entry <- dsm_checklists[[disorder]]
-
-      if (is.null(entry)) {
-        entry <- list()
-      }
-
-      if (!is.list(entry)) {
-        stop("Checklist for ", disorder, " must be a list.")
-      }
-
-      edition <- read_text(entry, "edition", disorder)
-      source_title <- read_text(entry, "source_title", disorder)
-      source_url <- read_text(entry, "source_url", disorder)
-
-      if (nzchar(source_url) &&
-          !grepl(
-            "^https?://[^[:space:]]+$",
-            source_url,
-            ignore.case = TRUE
-          )) {
-        stop(
-          "Source URL for ", disorder,
-          " must start with http:// or https://."
-        )
-      }
-
-      criteria <- entry$criteria
-
-      if (is.null(criteria)) {
-        criteria <- character(0)
-      }
-
-      if (!is.character(criteria) || anyNA(criteria)) {
-        stop(
-          "Criteria for ", disorder,
-          " must be a character vector without NA."
-        )
-      }
-
-      criteria <- criteria[nzchar(trimws(criteria))]
-
-      list(
-        edition = edition,
-        source_title = source_title,
-        source_url = source_url,
-        criteria = criteria
-      )
-    }),
-    disorders
-  )
-
-  # Create one expandable reference section for each disorder.
   checklist_section <- function(disorder, label) {
-
     entry <- checklists[[disorder]]
-
     shiny::tags$details(
       class = "dsm-section",
       shiny::tags$summary(label),
-
       shiny::tags$div(
         class = "dsm-content",
-
         shiny::tags$h4("DSM checklist"),
-
         shiny::tags$p(
           class = "reference-meta",
-          if (nzchar(entry$edition)) {
-            paste("Edition:", entry$edition)
-          } else {
-            "DSM edition not supplied."
-          }
+          if (nzchar(entry$edition)) paste("Edition:", entry$edition)
+          else "DSM edition not supplied."
         ),
-
         if (nzchar(entry$source_title)) {
-          shiny::tags$p(
-            class = "reference-meta",
-            paste("Source:", entry$source_title)
-          )
+          shiny::tags$p(class = "reference-meta", paste("Source:", entry$source_title))
         },
-
         if (nzchar(entry$source_url)) {
-          shiny::tags$p(
-            shiny::tags$a(
-              href = entry$source_url,
-              target = "_blank",
-              rel = "noopener noreferrer",
-              "Read source"
-            )
-          )
+          shiny::tags$p(shiny::tags$a(
+            href = entry$source_url, target = "_blank",
+            rel = "noopener noreferrer", "Read source"
+          ))
         },
-
         if (length(entry$criteria)) {
-          shiny::tags$ol(
-            lapply(entry$criteria, function(item) {
-              shiny::tags$li(item)
-            })
-          )
+          shiny::tagList(lapply(entry$criteria, function(item) {
+            shiny::tags$div(
+              item,
+              style = "white-space: pre-wrap; line-height: 1.6; margin: 12px 0;"
+            )
+          }))
         } else {
           shiny::tags$p(
             class = "empty-checklist",
@@ -313,503 +551,324 @@ symptom_key <- key[
     )
   }
 
-  # Build the user interface and its styling.
   ui <- shiny::fluidPage(
-
-    shiny::tags$head(
-      shiny::tags$style(
-        shiny::HTML("
-          body {
-            background: #f7f5f0;
-            color: #24364b;
-          }
-
-          .container-fluid {
-            max-width: 1400px;
-            padding: 24px;
-          }
-
-          .well {
-            background: #fff;
-            border: 1px solid #dce3ec;
-            border-radius: 12px;
-            box-shadow: none;
-          }
-
-          h1, h2, h3, h4 {
-            color: #172b4d;
-          }
-
-          .diagnosis-table {
-            width: 100%;
-            margin: 16px 0;
-            border-collapse: collapse;
-            background: #fff;
-            border-radius: 10px;
-            overflow: hidden;
-          }
-
-          .diagnosis-table th,
-          .diagnosis-table td {
-            padding: 12px 16px;
-            border-bottom: 1px solid #dde3eb;
-            text-align: left;
-          }
-
-          .diagnosis-table th {
-            background: #edf1f6;
-          }
-
-          .diagnosis-table tbody tr:nth-child(even) {
-            background: #fafbfd;
-          }
-
-          .diagnosis-status {
-            display: inline-block;
-            padding: 5px 10px;
-            border-radius: 999px;
-            font-weight: 600;
-          }
-
-          .diagnosis-present {
-color:#1855a3;
-  background-color:#edf4ff;
-  border:1px solid #bfd5f4;
-}
-
-.diagnosis-absent {
-color:#aa182c;
-  background-color:#fff0f2;
-  border:1px solid #edbec7;
-}
-
-.diagnosis-unknown {
-color:#505967;
-  background-color:#eff1f4;
-  border:1px solid #d3d8df;
-}
-
-          .symptom-disorder {
-            margin: 18px 0 8px;
-          }
-
-          .symptom-criterion {
-            color: #596575;
-            font-size: 13px;
-            margin: 12px 0 8px;
-          }
-
-          .symptom-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.symptom-card {
-  min-height: auto;
-  padding: 12px 16px;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-}
-
-.symptom-card .checkbox {
-  width: 100%;
-  margin: 0;
-  text-align: left;
-}
-
-.symptom-card .checkbox label {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 14px;
-  padding-left: 0;
-  width: 100%;
-  text-align: left;
-  white-space: normal;
-  overflow-wrap: anywhere;
-}
-
-.symptom-card input[type='checkbox'] {
-  position: relative;
-  margin: 0;
-  width: 34px;
-  height: 34px;
-  flex: 0 0 34px;
-}
-
-.symptom-card input[type='checkbox']:checked::after {
-  font-size: 20px;
-}
-
-.symptom-note {
-  width: 100%;
-  text-align: left;
-  margin-top: 6px;
-}
-
-          .symptom-note {
-            color: #64748b;
-            font-size: 12px;
-            text-align: center;
-          }
-
-          .dsm-section {
-            border: 1px solid #dce3ec;
-            border-radius: 9px;
-            margin: 10px 0;
-            background: #fff;
-          }
-
-          .dsm-section summary {
-            cursor: pointer;
-            padding: 14px;
-            font-weight: 600;
-          }
-
-          .dsm-section summary:focus-visible {
-            outline: 3px solid #8cb7ed;
-          }
-
-          .dsm-section[open] summary {
-            border-bottom: 1px solid #dce3ec;
-          }
-
-          .dsm-content {
-            padding: 4px 18px 16px;
-          }
-
-          .dsm-content li {
-            margin: 9px 0;
-            line-height: 1.6;
-            white-space: pre-wrap;
-          }
-
-          .reference-meta {
-            color: #596575;
-            font-size: 13px;
-          }
-
-          .empty-checklist {
-            padding: 12px;
-            background: #f5f7fa;
-            color: #596575;
-          }
-          .reference-panel {
-            padding: 18px;
-            margin-top: 18px;
-            background: #fff;
-            border: 1px solid #dce3ec;
-            border-radius: 12px;
-          }
-
-          .modal-dialog.modal-lg {
-            width: 96vw;
-            max-width: 1400px;
-          }
-
-          .expanded-reference {
-            max-height: 75vh;
-            overflow-y: auto;
-          }
-          .diagnosis-table .diagnosis-status.diagnosis-present {
-color:#1855a3;
-  background-color:#edf4ff;
-  border:1px solid #bfd5f4;
-}
-
-.diagnosis-table .diagnosis-status.diagnosis-absent {
-color:#aa182c;
-  background-color:#fff0f2;
-  border:1px solid #edbec7;
-}
-
-.diagnosis-table .diagnosis-status.diagnosis-unknown {
-color:#505967;
-  background-color:#eff1f4;
-  border:1px solid #d3d8df;
-}
-        ")
-      )
+    shiny::tags$head(shiny::tags$style(shiny::HTML("
+      body { background: #f7f5f0; color: #24364b; }
+      .container-fluid { max-width: 1400px; padding: 24px; }
+      .well {
+        background: #fff; border: 1px solid #dce3ec;
+        border-radius: 12px; box-shadow: none;
+      }
+      h1, h2, h3, h4 { color: #172b4d; }
+      .diagnosis-table {
+        width: 100%; margin: 16px 0; border-collapse: collapse;
+        background: #fff; border-radius: 10px; overflow: hidden;
+      }
+      .diagnosis-table th, .diagnosis-table td {
+        padding: 12px 16px; border-bottom: 1px solid #dde3eb; text-align: left;
+      }
+      .diagnosis-table th { background: #edf1f6; }
+      .diagnosis-table tbody tr:nth-child(even) { background: #fafbfd; }
+      .diagnosis-status {
+        display: inline-block; padding: 5px 10px;
+        border-radius: 999px; font-weight: 600;
+      }
+      .diagnosis-present {
+        color: #1855a3; background-color: #edf4ff; border: 1px solid #bfd5f4;
+      }
+      .diagnosis-absent {
+        color: #aa182c; background-color: #fff0f2; border: 1px solid #edbec7;
+      }
+      .diagnosis-unknown {
+        color: #505967; background-color: #eff1f4; border: 1px solid #d3d8df;
+      }
+      .symptom-disorder { margin: 18px 0 8px; }
+      .symptom-criterion {
+        color: #596575; font-size: 13px; margin: 12px 0 8px;
+      }
+      .symptom-grid { display: flex; flex-direction: column; gap: 10px; }
+      .symptom-card {
+        min-height: auto; padding: 12px 16px;
+        justify-content: flex-start; flex-wrap: wrap;
+      }
+      .symptom-card .checkbox { width: 100%; margin: 0; text-align: left; }
+      .symptom-card .checkbox label {
+        display: flex; flex-direction: row; align-items: center;
+        justify-content: flex-start; gap: 14px; padding-left: 0;
+        width: 100%; text-align: left; white-space: normal; overflow-wrap: anywhere;
+      }
+      .symptom-card input[type='checkbox'] {
+        position: relative; margin: 0; width: 34px; height: 34px; flex: 0 0 34px;
+      }
+      .symptom-card input[type='checkbox']:checked::after { font-size: 20px; }
+      .symptom-note {
+        width: 100%; margin-top: 6px; color: #64748b;
+        font-size: 12px; text-align: center;
+      }
+      .dsm-section {
+        border: 1px solid #dce3ec; border-radius: 9px;
+        margin: 10px 0; background: #fff;
+      }
+      .dsm-section summary { cursor: pointer; padding: 14px; font-weight: 600; }
+      .dsm-section summary:focus-visible { outline: 3px solid #8cb7ed; }
+      .dsm-section[open] summary { border-bottom: 1px solid #dce3ec; }
+      .dsm-content { padding: 4px 18px 16px; }
+      .dsm-content li { margin: 9px 0; line-height: 1.6; white-space: pre-wrap; }
+      .reference-meta { color: #596575; font-size: 13px; }
+      .empty-checklist { padding: 12px; background: #f5f7fa; color: #596575; }
+      .reference-panel {
+        padding: 18px; margin-top: 18px; background: #fff;
+        border: 1px solid #dce3ec; border-radius: 12px;
+      }
+      .modal-dialog.modal-lg { width: 96vw; max-width: 1400px; }
+      .expanded-reference { max-height: 75vh; overflow-y: auto; }
+      .diagnosis-table .diagnosis-status.diagnosis-present {
+        color: #1855a3; background-color: #edf4ff; border: 1px solid #bfd5f4;
+      }
+      .diagnosis-table .diagnosis-status.diagnosis-absent {
+        color: #aa182c; background-color: #fff0f2; border: 1px solid #edbec7;
+      }
+      .diagnosis-table .diagnosis-status.diagnosis-unknown {
+        color: #505967; background-color: #eff1f4; border: 1px solid #d3d8df;
+      }
+      @media (min-width: 768px) {
+        .simulation-layout > .row { display: flex; align-items: stretch; }
+        .simulation-layout > .row > .col-sm-4 > .well {
+          height: 100%; margin-bottom: 0;
+        }
+        .simulation-diagnosis {
+          position: sticky; top: 20px; background: #fff;
+          padding-top: 1px; padding-bottom: 8px;
+        }
+      }
+    "))),
+    shiny::titlePanel(
+      title = "Psychiatric Symptom Profile & Diagnostic Tool Simulation App",
+      windowTitle = "Symptom Explorer"
     ),
-
-    shiny::titlePanel(title = "Psychiatric Symptom Profile & Diagnostic Tool Simulation App", windowTitle = "Symptom Explorer"), shiny::tags$p("Welcome! Explore DSM V criteria for Bipolar Disorder, Depression, Anxiety, and PTSD, individual symptom profiles, and simulate alternative diagnostic scenarios. This app is intended as a visual teaching tool for understanding the DSM V diagnostic structure.",
-                                                                                                                                               class = "app-subtitle"), 
-shiny::tags$section(
-  class = "reference-panel",
-  shiny::h3("DSM textbook reference"),
-  shiny::p(
-    "Review the sourced criteria for each disorder. ",
-    "Select a disorder to expand its checklist."
-  ),
-  shiny::actionButton("expand_reference", "Open expanded reference view"),
-  shiny::tagList(lapply(seq_along(disorders), function(i) {
-    checklist_section(disorders[i], disorder_labels[i])
-  }))
-), shiny::hr(), 
-
-    shiny::sidebarLayout(
-
-      shiny::sidebarPanel(
-        shiny::selectizeInput(
-          "participant",
-          "Select an example profile",
-          choices = as.character(seq_len(nrow(app_data))),
-          selected = "1"
-        ), 
-        
-        shiny::hr(),
-
-        shiny::h4("Diagnosis"),
-
-        shiny::textOutput("selected_row"),
-
-        shiny::uiOutput("diagnosis_table"),
-
-        shiny::hr(),
-
-        shiny::helpText(
-          "Symptom controls are a visual prototype. Toggling them does not save ",
-          "changes or recalculate diagnosis labels."
-        )
-      ), shiny::mainPanel(
-
-        shiny::h3("Symptom profile"),
-
-        shiny::p(
-          "Symptoms are grouped using the current variable key. The circles ",
-          "show the selected row's recorded values. Changes do not yet ",
-          "recalculate diagnosis labels."
+    shiny::tags$p(
+      "Welcome! Explore DSM V criteria for Bipolar Disorder, Depression, Anxiety, and PTSD, individual symptom profiles, and simulate alternative diagnostic scenarios. This app is intended as a visual teaching tool for understanding the DSM V diagnostic structure.",
+      class = "app-subtitle"
+    ),
+    shiny::tags$section(
+      class = "reference-panel",
+      shiny::h3("DSM textbook reference"),
+      shiny::p("Review the sourced criteria for each disorder. ",
+               "Select a disorder to expand its checklist."),
+      shiny::actionButton("expand_reference", "Open expanded reference view"),
+      shiny::tagList(lapply(seq_along(disorders), function(i) {
+        checklist_section(disorders[i], disorder_labels[i])
+      }))
+    ),
+    shiny::hr(),
+    shiny::tags$div(
+      class = "simulation-layout",
+      shiny::sidebarLayout(
+        shiny::sidebarPanel(
+          shiny::selectizeInput(
+            "participant", "Select an example profile",
+            choices = as.character(seq_len(nrow(app_data))), selected = "1"
+          ),
+          shiny::actionButton("reset_simulation", "Reset symptoms"),
+          shiny::hr(),
+          shiny::tags$div(
+            class = "simulation-diagnosis",
+            shiny::h4("Diagnosis"),
+            shiny::textOutput("selected_row"),
+            shiny::uiOutput("diagnosis_table")
+          ),
+          shiny::hr(),
+          shiny::helpText(
+            "Toggle symptoms to recalculate the displayed labels. ",
+            "Changes are temporary and are not saved."
+          )
         ),
-
-        shiny::uiOutput("symptom_map"),
-
-
-        shiny::hr(),
-
-        shiny::h4("Interpretation"),
-
-        shiny::p(
-           "Present (blue) means 1; absent (red) means 0. ",
-  "Missing labels are shown as unknown (grey), not absent."
-        ),
-
-        shiny::p(
-          "Educational use only. Displayed labels are calculated using the ", "dataset's implemented DSM-style rules, which may differ from full ", "DSM criteria. The DSM reference is provided separately for comparison; ", "these labels are not clinical diagnoses."
-        ),
-
-        shiny::p(
-          "This educational app is not a diagnostic tool. Supply only reference ",
-          "text you have permission to reproduce, and include its edition and source."
+        shiny::mainPanel(
+          shiny::h3("Symptom profile"),
+          shiny::p(
+            "Symptoms are grouped using the current variable key. ",
+            "The controls start with the selected profile's recorded values. ",
+            "Toggle them to explore how the implemented rules change the labels."
+          ),
+          shiny::uiOutput("symptom_map"),
+          shiny::hr(),
+          shiny::h4("Interpretation"),
+          shiny::p(
+            "Present (blue) means 1; absent (red) means 0. ",
+            "Missing labels are shown as unknown (grey), not absent."
+          ),
+          shiny::p(
+            "Educational use only. Displayed labels are calculated using the ",
+            "dataset's implemented DSM-style rules, which may differ from full ",
+            "DSM criteria. The DSM reference is provided separately for comparison; ",
+            "these labels are not clinical diagnoses."
+          ),
+          shiny::p(
+            "This educational app is not a diagnostic tool. Supply only reference ",
+            "text you have permission to reproduce, and include its edition and source."
+          )
         )
       )
     )
   )
 
-  # Define how the app responds to the selected dataset row.
   server <- function(input, output, session) {
-    
     shiny::observeEvent(input$expand_reference, {
-  shiny::showModal(
-    shiny::modalDialog(
-      title = "DSM textbook reference",
-      size = "l",
-      easyClose = TRUE,
-      footer = shiny::modalButton("Close"),
-      shiny::tags$div(
-        class = "expanded-reference",
-        shiny::tagList(
-          lapply(seq_along(disorders), function(i) {
+      shiny::showModal(shiny::modalDialog(
+        title = "DSM textbook reference", size = "l", easyClose = TRUE,
+        footer = shiny::modalButton("Close"),
+        shiny::tags$div(
+          class = "expanded-reference",
+          shiny::tagList(lapply(seq_along(disorders), function(i) {
             checklist_section(disorders[i], disorder_labels[i])
-          })
+          }))
         )
-      )
-    )
-  )
-})
+      ))
+    })
 
-    # Retrieve the selected row from the rebuilt dataset.
     original_profile <- shiny::reactive({
-
       shiny::req(input$participant)
-
       row_number <- suppressWarnings(as.integer(input$participant))
-
-      shiny::validate(
-        shiny::need(
-          length(row_number) == 1L &&
-            !is.na(row_number) &&
-            row_number >= 1L &&
-            row_number <= nrow(app_data),
-          "Select a valid dataset row."
-        )
-      )
-
+      shiny::validate(shiny::need(
+        length(row_number) == 1L && !is.na(row_number) &&
+          row_number >= 1L && row_number <= nrow(app_data),
+        "Select a valid dataset row."
+      ))
       app_data[row_number, , drop = FALSE]
     })
 
-    # Draw symptom circles grouped by disorder and criterion.
-    # Each symptom has a unique input ID based on its key-row position.
-    # Missing values are disabled rather than treated as absent.
-    output$symptom_map <- shiny::renderUI({
+    # Fresh input IDs prevent previous checkbox values leaking into a new profile.
+    simulation_generation <- shiny::reactiveVal(0L)
+    shiny::observeEvent(input$participant, {
+      simulation_generation(simulation_generation() + 1L)
+    }, priority = 100)
+    shiny::observeEvent(input$reset_simulation, {
+      simulation_generation(simulation_generation() + 1L)
+    }, ignoreInit = TRUE, priority = 100)
 
+    symptom_input_id <- function(i, generation, participant) {
+      paste0("symptom_toggle_", participant, "_", generation, "_", i)
+    }
+
+    simulated_profile <- shiny::reactive({
       profile <- original_profile()
-
-      if (nrow(symptom_key) == 0L) {
-        return(
-          shiny::p(
-            "No symptom variables could be grouped from variable_key.",
-            class = "empty-checklist"
-          )
-        )
-      }
-
-      symptom_sections <- lapply(disorders, function(disorder) {
-
-        disorder_rows <- which(symptom_key$disorder == disorder)
-
-        if (length(disorder_rows) == 0L) {
-          return(NULL)
+      generation <- simulation_generation()
+      participant <- input$participant
+      for (i in seq_len(nrow(symptom_key))) {
+        column_name <- symptom_key$name[i]
+        recorded_value <- profile[[column_name]][1]
+        if (is.na(recorded_value)) next
+        input_id <- symptom_input_id(i, generation, participant)
+        toggled_value <- input[[input_id]]
+        # Retain recorded values until freshly rendered inputs reach the server.
+        if (!is.null(toggled_value)) {
+          profile[[column_name]][1] <- as.integer(isTRUE(toggled_value))
         }
+      }
+      apply_dsm_rules(profile, key, thresholds = default_thresholds)
+    })
 
-        # Group symptoms by criterion, preserving their key order.
+    # Do not depend on simulated_profile here: toggling must not redraw controls.
+    output$symptom_map <- shiny::renderUI({
+      profile <- original_profile()
+      generation <- simulation_generation()
+      participant <- input$participant
+      if (nrow(symptom_key) == 0L) {
+        return(shiny::p(
+          "No symptom variables could be grouped from variable_key.",
+          class = "empty-checklist"
+        ))
+      }
+      symptom_sections <- lapply(disorders, function(disorder) {
+        disorder_rows <- which(symptom_key$disorder == disorder)
+        if (length(disorder_rows) == 0L) return(NULL)
         criteria <- unique(symptom_key$criterion[disorder_rows])
-
         criterion_sections <- lapply(criteria, function(criterion) {
-
-          rows <- disorder_rows[
-            symptom_key$criterion[disorder_rows] == criterion
-          ]
-
+          rows <- disorder_rows[symptom_key$criterion[disorder_rows] == criterion]
           symptom_cards <- lapply(rows, function(i) {
-
             column_name <- symptom_key$name[i]
             value <- profile[[column_name]][1]
             missing_value <- is.na(value)
-            input_id <- paste0("symptom_toggle_", i)
-
+            input_id <- symptom_input_id(i, generation, participant)
+            label <- as.character(symptom_key$original[i])
             shiny::tags$div(
               class = "symptom-card",
-
-              shiny::checkboxInput(
-                inputId = input_id,
-                label = as.character(symptom_key$original[i]),
-                value = !missing_value && as.numeric(value) == 1,
-                width = "100%"
-              ),
-
               if (missing_value) {
                 shiny::tags$div(
-                  "Missing value",
-                  class = "symptom-note"
+                  class = "checkbox",
+                  shiny::tags$label(
+                    shiny::tags$input(
+                      type = "checkbox", disabled = "disabled",
+                      `aria-label` = paste(label, "— missing value")
+                    ),
+                    label
+                  )
                 )
+              } else {
+                shiny::checkboxInput(
+                  inputId = input_id, label = label,
+                  value = as.numeric(value) == 1, width = "100%"
+                )
+              },
+              if (missing_value) {
+                shiny::tags$div("Missing value — not editable", class = "symptom-note")
               }
             )
           })
-
           shiny::tagList(
-
             shiny::tags$h4(
-              if (is.na(criterion) || !nzchar(criterion)) {
-                "Symptoms"
-              } else {
-                paste("Criterion", criterion)
-              },
+              if (is.na(criterion) || !nzchar(criterion)) "Symptoms"
+              else paste("Criterion", criterion),
               class = "symptom-criterion"
             ),
-
-            shiny::tags$div(
-              class = "symptom-grid",
-              symptom_cards
-            )
+            shiny::tags$div(class = "symptom-grid", symptom_cards)
           )
         })
-
         shiny::tagList(
-
           shiny::tags$h3(
-            disorder_labels[match(disorder, disorders)],
-            class = "symptom-disorder"
+            disorder_labels[match(disorder, disorders)], class = "symptom-disorder"
           ),
-
           criterion_sections
         )
       })
-
       shiny::tagList(symptom_sections)
     })
 
-    # Display which row is currently selected.
     output$selected_row <- shiny::renderText({
       original_profile()
       paste("Selected example profile:", input$participant)
     })
 
-    # Show the rebuilt diagnosis labels with styled status indicators.
     output$diagnosis_table <- shiny::renderUI({
-
-      profile <- original_profile()
-
-      values <- as.numeric(
-        unlist(
-          profile[, rule_columns, drop = FALSE],
-          use.names = FALSE
-        )
-      )
-
+      profile <- simulated_profile()
+      values <- as.numeric(unlist(
+        profile[, rule_columns, drop = FALSE], use.names = FALSE
+      ))
       shiny::tags$table(
         class = "diagnosis-table",
-        `aria-label` =
-          "Disorders and diagnosis labels for the selected dataset row",
-
-        shiny::tags$thead(
-          shiny::tags$tr(
-            shiny::tags$th(scope = "col", "Disorder"),
-            shiny::tags$th(scope = "col", "Diagnosis")
+        `aria-label` = "Disorders and diagnosis labels for the selected dataset row",
+        shiny::tags$thead(shiny::tags$tr(
+          shiny::tags$th(scope = "col", "Disorder"),
+          shiny::tags$th(scope = "col", "Diagnosis")
+        )),
+        shiny::tags$tbody(lapply(seq_along(disorders), function(i) {
+          value <- values[i]
+          state <- if (is.na(value)) "unknown" else if (value == 1) "present" else "absent"
+          label <- switch(state,
+            present = "Present", absent = "Absent", unknown = "Unknown (missing data)"
           )
-        ),
-
-        shiny::tags$tbody(
-          lapply(seq_along(disorders), function(i) {
-
-            value <- values[i]
-
-            state <- if (is.na(value)) {
-              "unknown"
-            } else if (value == 1) {
-              "present"
-            } else {
-              "absent"
-            }
-
-            label <- switch(
-              state,
-              present = "Present",
-              absent = "Absent",
-              unknown = "Unknown (missing data)"
-            )
-
-            shiny::tags$tr(
-              shiny::tags$td(disorder_labels[i]),
-
-              shiny::tags$td(
-                shiny::tags$span(
-                  class = paste(
-                    "diagnosis-status",
-                    paste0("diagnosis-", state)
-                  ),
-                  label
-                )
-              )
-            )
-          })
-        )
+          shiny::tags$tr(
+            shiny::tags$td(disorder_labels[i]),
+            shiny::tags$td(shiny::tags$span(
+              class = paste("diagnosis-status", paste0("diagnosis-", state)),
+              label
+            ))
+          )
+        }))
       )
     })
   }
 
-  # Return the app without launching it automatically.
   shiny::shinyApp(ui = ui, server = server)
 }
 
