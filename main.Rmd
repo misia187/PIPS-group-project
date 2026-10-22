@@ -1,17 +1,28 @@
-
 ---
 title: "Exploring Symptom Patterns and Diagnostic Classification"
 subtitle: "A Computational Analysis of Synthetic Mental Health Data"
 author: "PIPS Group: Tess, Sherilyn, Misia | Programming in Psychological Science"
 date: "2026-10-22"
+
 output:
   html_document:
+    theme: readable
     toc: true
     toc_depth: 3
-    toc_float: true
+    toc_float:
+      collapsed: false
+      smooth_scroll: true
     number_sections: true
-    theme: readable
+    code_folding: hide
 ---
+
+### Project at a glance
+
+| Dataset | Diagnostic categories | Core methods |
+|:---:|:---:|:---|
+| **3,753 synthetic profiles** | **5 psychiatric categories** | Chi-square tests, FDR correction, rule-based classification and Shiny simulation |
+
+This report examines statistical patterns in synthetic psychiatric symptom data and demonstrates how predefined classification rules respond to different symptom combinations.
 
 # Introduction
 
@@ -19,7 +30,7 @@ This project examines the relationship between psychiatric symptoms and diagnost
 
 The primary aim is to explore how symptom patterns relate to diagnostic outcomes and to demonstrate how statistical and computational methods can be used to investigate these relationships. Specifically, the project addresses three questions: (1) How strongly are individual symptoms associated with their corresponding diagnoses and with other psychiatric diagnoses? (2) To what extent do different diagnoses co-occur in the dataset? (3) How do symptom counts and diagnostic thresholds influence the likelihood of meeting the dataset's diagnostic classification rules?
 
-To address these questions, the project combines data preparation and validation, rule-based diagnostic classification, statistical association tests, and graphical visualisations. An interactive component is also planned to allow users to explore selected aspects of the data or classification rules.
+To address these questions, the project combines data preparation and validation, rule-based diagnostic classification, statistical association tests, graphical visualisations, and an interactive Shiny application. The application enables users to explore synthetic symptom profiles, modify individual symptom indicators, and observe how these changes affect diagnostic classifications under the dataset's predefined rules.
 
 Importantly, the dataset is synthetically generated, and its diagnostic indicators follow predefined rules. Consequently, the analyses primarily demonstrate computational and statistical relationships within the simulated data rather than providing empirical evidence about symptom distributions, diagnostic validity, or comorbidity in clinical populations.
 
@@ -112,17 +123,15 @@ Because the dataset was generated synthetically, its distributions and diagnosti
 
 # Interactive component
 
-The project includes an interactive Shiny application, implemented in `Shiny_Sim.Rmd`, designed to help users explore symptom profiles and diagnostic classifications within the synthetic dataset.
+The project includes an interactive Shiny application implemented in `Shiny_Sim.Rmd`, designed to demonstrate how individual symptom profiles contribute to rule-based psychiatric classifications. Users can select from 3,753 synthetic example profiles and inspect the corresponding symptoms and diagnostic classifications across five psychiatric categories: bipolar disorder, depression, anxiety, schizophrenia, and posttraumatic stress disorder (PTSD).
 
-Users can select an individual dataset row to view its corresponding diagnostic indicators and symptom profile. Symptoms are organised by psychiatric disorder and diagnostic criterion, with visual indicators distinguishing present and absent symptoms. The application also provides expandable sections intended for reference information about diagnostic criteria.
+The application presents symptoms organised by disorder and diagnostic criterion, using descriptive labels and interactive checkboxes to distinguish present and absent indicators. Users can modify individual symptom values to simulate alternative profiles. Following each modification, the application recalculates diagnostic classifications using the existing `apply_dsm_rules()` function and its predefined thresholds. The displayed classifications update in response to these changes, enabling users to explore how the same classification rules produce different outcomes depending on the symptom combination.
 
-The application uses the same data-processing and DSM-style classification functions as the statistical analyses, helping maintain consistency between the project's computational components.
+A reset function restores the selected example profile's original symptom values and corresponding classifications. All modifications remain temporary and do not alter the underlying dataset. Users can also select another example profile to examine different combinations of symptoms.
 
-**Current functionality and limitations.** The initial prototype displays the selected participant's recorded symptoms and reconstructed diagnostic labels. Although symptom indicators are presented as interactive controls, changing them does not yet recalculate diagnostic classifications. A future version will allow users to modify symptoms and compare the resulting classifications with the original dataset labels while keeping the diagnostic thresholds fixed.
+Additionally, the application includes an expandable DSM-5 reference section that allows users to compare the dataset's classification logic with clinical diagnostic criteria. Importantly, the implemented rules are simplified and do not fully reproduce DSM-5 diagnostic requirements. The application therefore serves as an educational simulation of computational classification rather than a clinical diagnostic tool.
 
-The application is intended exclusively as an educational demonstration of simplified, rule-based classification using synthetic data. It is not a clinical diagnostic tool.
-
-To explore the interactive component, open `Shiny_Sim.Rmd` in RStudio and run the application code. Additional setup instructions are provided in the repository's `README.md`.
+To launch the application, open `Shiny_Sim.Rmd` in RStudio and execute its code chunks in sequence. Further instructions are provided in the repository's `README.md`.
 
 # Statistical analysis
 
@@ -220,7 +229,7 @@ Another limitation concerns the distribution of symptoms. Many symptom indicator
 
 The absence of statistically significant associations between different diagnoses should also be interpreted cautiously. Nonsignificant findings do not establish statistical independence (Altman & Bland, 1995). In clinical populations, comorbidity may arise through shared or interacting symptoms, as illustrated by the network perspective proposed by Cramer et al. (2010). Such relationships are not necessarily captured by the present dataset's simplified classification structure.
 
-Future developments could incorporate more realistic symptom frequencies, correlated symptoms across disorders, and more comprehensive representations of diagnostic criteria. Additionally, the Shiny application could allow users to modify individual symptom profiles and observe how diagnostic classifications change under fixed thresholds. Together, these improvements could provide a more informative demonstration of diagnostic complexity while retaining the project's educational and computational objectives.
+Future developments could incorporate more realistic symptom frequencies, correlated symptoms across disorders, and more comprehensive representations of diagnostic criteria. Although the interactive Shiny application enables users to manipulate symptom profiles and observe changes in rule-based diagnostic classifications, these simulations remain constrained by the simplified structure of the synthetic dataset. Extending the application to incorporate more realistic symptom dependencies, dimensional symptom severity, and additional clinical criteria could provide a more comprehensive demonstration of psychiatric classification. Such developments would improve the educational value of the simulation while maintaining the distinction between computational rule-based classifications and clinical diagnostic assessment.
 
 # References
 

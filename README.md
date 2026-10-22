@@ -4,25 +4,34 @@
 
 This repository contains a group project developed for the *Programming in Psychological Science* course at the University of Amsterdam.
 
-The project explores relationships between psychiatric symptoms and diagnostic classifications using a synthetic mental health dataset. It combines data processing, diagnostic rule verification, statistical analyses, visualisations, and an interactive Shiny application.
+The project investigates relationships between psychiatric symptoms and diagnostic classifications using a synthetic mental health dataset. It combines data preparation, rule-based diagnostic classification, statistical analyses, visualisations, independent function testing, and an interactive Shiny application.
 
-**The project is intended for educational purposes and does not provide clinical diagnoses.**
+**Disclaimer:** This project is intended exclusively for educational and programming purposes. It does not provide clinical diagnoses, and its findings should not be generalised to clinical populations.
+
+
+## Interactive application preview
+
+![PIPS Shiny application showing symptom profiles and simulated diagnostic classifications](images/shiny_app_preview.png)
+
+*Explore synthetic psychiatric symptom profiles, modify individual symptoms, and observe how predefined diagnostic classification rules respond. Changes can be reset and do not alter the original dataset.*
 
 ## Project objectives
 
-The project addresses three main questions:
+The project addresses three research questions:
 
-1. How are individual psychiatric symptoms associated with their corresponding diagnoses and with other diagnoses?
+1. How are individual psychiatric symptoms associated with their corresponding diagnoses and with other diagnostic categories?
 2. To what extent do different psychiatric diagnoses co-occur in the dataset?
 3. How do symptom counts and predefined diagnostic thresholds influence classification outcomes?
 
-The interactive component additionally aims to demonstrate how changes to symptom profiles can influence diagnostic classifications.
+The interactive Shiny application complements these analyses by allowing users to explore individual symptom profiles and their associated diagnostic classifications.
 
 ## Dataset
 
-The project uses `Mentalillness.csv`, a synthetic mental health dataset obtained from Kaggle.
+The project uses *Mental illness dataset*, a synthetic dataset obtained from Kaggle (Bakshi, n.d.).
 
-The original dataset contains 3,753 participant records and 58 binary symptom, criterion, and diagnostic variables covering five psychiatric disorders:
+**Dataset source:** [Mental illness dataset — Kaggle](https://www.kaggle.com/datasets/karanbakshi1/mental-illness-dataset)
+
+The dataset contains 3,753 synthetic participant records and 58 binary variables representing 53 symptom and criterion indicators and five diagnostic classifications:
 
 - Bipolar disorder
 - Schizophrenia
@@ -30,51 +39,84 @@ The original dataset contains 3,753 participant records and 58 binary symptom, c
 - Anxiety disorder
 - Post-traumatic stress disorder (PTSD)
 
-Variables are coded as 0 (absent) or 1 (present).
+Variables are coded as `0` (absent) or `1` (present).
 
-A variable key maps the original column names to shorter, standardised names and identifies their associated disorders and criteria.
+The original data are stored in `data/Mentalillness.csv`. A variable key, saved in `data/variable_key.csv`, maps the original column names to standardised short names and identifies the corresponding disorders and criteria.
 
-**Important:** The data are synthetically generated, and diagnostic outcomes follow predefined classification rules. Results should not be interpreted as representative of real clinical populations.
+The dataset's diagnostic classifications follow simplified DSM-style rules. Although these rules are inspired by psychiatric diagnostic criteria, they do not fully reproduce the clinical requirements described in the DSM-5 (American Psychiatric Association, 2013).
+
+Consequently, the dataset is suitable for demonstrating statistical analysis, programming, and rule-based classification, but not for drawing clinical conclusions about actual psychiatric populations.
 
 ## Project components
 
 ### 1. Data preparation and validation
 
-The project loads the dataset, standardises variable names, checks binary values, and constructs a variable key.
+The project uses reusable R functions to load the dataset, standardise variable names, construct a variable key, and validate the binary indicators.
+
+The validation procedures check for invalid values, missing observations, and nonexistent columns.
 
 ### 2. Diagnostic rule verification
 
-The five diagnostic indicators are reconstructed using predefined DSM-style classification rules.
+Diagnostic labels are reconstructed from the symptom and criterion indicators using predefined classification rules.
 
-The implementation includes checks of agreement with the original diagnosis variables and tests of selected threshold conditions.
+The implementation includes:
+
+- Reconstruction of all five diagnostic indicators.
+- Comparison of reconstructed and original diagnostic classifications.
+- Testing of selected diagnostic thresholds and boundary conditions.
+- Verification of classification consistency across observations.
+
+These procedures assess whether the R functions reproduce the dataset's rules correctly, rather than establishing the clinical validity of those rules.
 
 ### 3. Statistical analyses
 
-The project includes:
+The project investigates symptom–diagnosis associations, diagnostic co-occurrence, and symptom-count thresholds.
 
-- Chi-square tests of symptom–diagnosis associations
-- Phi coefficients as measures of association
-- False discovery rate correction for multiple testing
-- Comparisons of observed and expected diagnostic co-occurrence
-- Visualisations of symptom counts and diagnostic thresholds
+The analyses include:
+
+- Chi-square tests of symptom–diagnosis associations.
+- Phi coefficients as measures of association.
+- False discovery rate (FDR) correction for multiple testing.
+- Comparisons of observed and expected diagnostic co-occurrence.
+- Analyses of the proportion classified with a diagnosis at different symptom counts.
+
+The results are presented in the main report alongside statistical tables and visualisations.
 
 ### 4. Data visualisations
 
-Three principal figures are generated:
+Three principal figures illustrate the findings:
 
-- A symptom–diagnosis association heatmap
-- An observed-versus-expected comorbidity plot
-- A symptom-count and diagnostic-classification plot
+- **Symptom–diagnosis heatmap:** Displays associations between individual symptoms and diagnostic categories.
+- **Comorbidity plot:** Compares observed and expected co-occurrence frequencies for pairs of diagnoses.
+- **Symptom-count plot:** Illustrates the relationship between symptom counts, diagnostic thresholds, and classification outcomes.
 
-Figures and result tables are saved in the `output/` directory.
+Generated figures are stored in `output/figures/`, while statistical result tables are saved in `output/tables/`.
 
-### 5. Interactive Shiny application
+### Interactive Shiny application
 
-The Shiny application allows users to select a dataset row and explore its recorded symptom profile and diagnostic indicators.
+The project includes an interactive Shiny application implemented in `Shiny_Sim.Rmd`. It allows users to explore individual symptom profiles and investigate how modifying symptom indicators affects rule-based diagnostic classifications.
+Users can select from 3,753 synthetic example profiles, examine symptom indicators grouped by disorder and criterion, and toggle individual symptoms to simulate alternative profiles. Diagnostic classifications are automatically recalculated using `apply_dsm_rules()` and the dataset's predefined thresholds.
+The **Reset symptoms** button restores the selected profile's original symptom values and classifications. All modifications are temporary and do not alter the underlying dataset.
+The application also provides expandable DSM-5 reference information, allowing users to compare the implemented classification rules with clinical diagnostic criteria. The dataset's simplified rules do not fully reproduce DSM-5 requirements.
+**The application is intended solely for educational purposes and must not be used for clinical diagnosis.**
 
-Symptoms are grouped by disorder and classification criterion, alongside a reference section for diagnostic criteria.
+### 6. Independent function testing
 
-**Current development status:** The initial prototype displays symptom profiles and diagnostic labels. Interactive symptom modifications are not yet connected to recalculation of the diagnoses. This functionality is planned for a later update.
+The project includes an independent testing script, `tests/test_functions.R`, which verifies the behaviour of functions developed across the project.
+
+Testing covers:
+
+- Acceptance of valid binary data.
+- Rejection of invalid values, missing observations, and nonexistent columns.
+- Successful dataset loading and handling of invalid file paths.
+- Variable-key completeness, structure, and uniqueness.
+- DSM-rule output structure, classification consistency, and reproducibility.
+- Sensitivity of diagnostic classifications to changes in symptom profiles.
+- Shiny application input validation and successful application-object creation.
+
+Independent testing also identified a missing-column validation issue in `check_binary()`. The function was updated to verify that requested columns exist before evaluating their values.
+
+The tests were successfully executed after restarting R, helping verify that they do not depend on objects retained from previous interactive sessions.
 
 ## Repository structure
 
@@ -85,11 +127,11 @@ PIPS-group-project/
 │   └── variable_key.csv
 ├── src/
 │   └── r/
-│       ├── functions_data.R
-│       ├── functions_variable_key.R
-│       ├── functions_dsm_rules.R
-│       ├── functions_analysis.R
 │       ├── analyses.R
+│       ├── functions_analysis.R
+│       ├── functions_data.R
+│       ├── functions_dsm_rules.R
+│       ├── functions_variable_key.R
 │       ├── plots.R
 │       └── test_dsm_rules.R
 ├── tests/
@@ -97,103 +139,146 @@ PIPS-group-project/
 ├── output/
 │   ├── figures/
 │   └── tables/
+│       ├── comorbidity.csv
+│       ├── count_vs_diagnosis.csv
+│       └── symptom_associations.csv
 ├── main.Rmd
+├── main.html
 ├── Shiny_Sim.Rmd
 ├── README.md
-└── PIPS-group-project.Rproj
+├── PIPS-group-project.Rproj
+├── .gitignore
+└── LICENSE
 ```
 
+The project is organised into separate directories for source data, reusable functions, independent tests, and generated outputs.
+
+`main.Rmd` is the main analytical report, while `main.html` is its rendered HTML version.
+
+`Shiny_Sim.Rmd` contains the interactive Shiny application.
+
+The directory structure should be maintained when downloading or cloning the repository, as the scripts use relative file paths.
 
 ## Getting started
 
 ### 1. Clone the repository
 
+Clone the repository using Git:
+
 ```bash
 git clone https://github.com/misia187/PIPS-group-project.git
 ```
 
-Alternatively, download the ZIP file from GitHub.
+Alternatively, select **Code → Download ZIP** on GitHub and extract the files.
 
-### 2. Open the project
+### 2. Open the RStudio project
 
 Open `PIPS-group-project.Rproj` in RStudio.
 
-Keep the project directory structure intact because the scripts use relative file paths.
+This makes it easier to work with the project files using their relative paths.
 
-### 3. Install dependencies
+### 3. Install the required packages
 
-The project requires R and the following packages:
+The project uses R and the following packages:
 
-- `dplyr` — Data manipulation
-- `ggplot2` — Data visualisation
-- `shiny` — Interactive Shiny application
-- `rmarkdown` — HTML report generation
-- `knitr` — R Markdown code execution and tables
+- `dplyr` — Data manipulation.
+- `ggplot2` — Statistical visualisation.
+- `shiny` — Interactive application.
+- `rmarkdown` — Rendering the HTML report.
+- `knitr` — Executing and formatting R Markdown output.
 
-Install them in RStudio by running:
+Install the packages in the R Console:
 
 ```r
-install.packages(c("dplyr", "ggplot2", "shiny", "rmarkdown", "knitr"))
+install.packages(c(
+  "dplyr",
+  "ggplot2",
+  "shiny",
+  "rmarkdown",
+  "knitr"
+))
 ```
 
-The `stats`, `tools`, and `utils` packages are included with R and do not require separate installation.
+The `stats`, `tools`, and `utils` packages are included with standard R installations and do not require separate installation.
 
 ## Running the statistical report
 
 1. Open `main.Rmd` in RStudio.
-2. Click **Knit** to render the document.
-3. Review the generated HTML report.
+2. Click **Knit** to generate the HTML report.
+3. Open the resulting `main.html` file to review the results.
 
-The document includes dataset information, diagnostic rule verification, statistical results, and visualisations.
+Alternatively, run:
+
+```r
+rmarkdown::render("main.Rmd")
+```
+
+The report contains the dataset description, diagnostic-rule verification, statistical analyses, visualisations, interpretation, methodological limitations, and academic references.
+
+The existing `main.html` can also be opened directly in a web browser without running R.
 
 ## Running the Shiny application
 
-Open PIPS-group-project.Rproj in RStudio.
+1. Open `PIPS-group-project.Rproj` in RStudio.
+2. Make sure the required R packages are installed.
+3. Open `Shiny_Sim.Rmd`.
+4. Execute its setup and application code to load the data, define the application function, and construct the Shiny application.
+5. Launch the constructed application from RStudio.
 
-Install the required packages if they are not already available.
+The application loads data from the project's `data/` directory and uses the existing data-processing and diagnostic-rule functions.
 
-Open Shiny_Sim.Rmd.
+**Note:** The app currently supports exploring recorded symptom profiles and classifications. Recalculation of classifications after manually changing symptom indicators remains under development.
 
-Execute the setup and application code in RStudio to initialise the dataset and construct the Shiny application.
+The application must not be used to make clinical diagnostic decisions.
 
-Launch the returned Shiny application using RStudio.
-
-The application allows users to select a dataset row and inspect its symptom profile, original diagnostic classifications, and associated DSM-style criteria.
-
-***Current prototype limitation:*** Symptom checkboxes can be toggled, but the displayed diagnoses do not yet recalculate in response to these changes. This functionality is planned for a subsequent update.
-
-The application is intended for educational exploration of synthetic data and should not be used for clinical diagnosis.
 ## Running the tests
 
-Preliminary project and data checks can be run from the project directory:
+Independent function tests can be executed from the project directory using:
 
 ```r
 source("tests/test_functions.R")
 ```
 
-The project also contains DSM-rule verification code in:
+The script runs validation checks for the dataset, variable key, classification functions, and Shiny application.
+
+Additional DSM-rule verification code is maintained in:
 
 `src/r/test_dsm_rules.R`
 
-Additional independent function tests are being developed.
+A successful execution prints confirmation messages for the completed checks. An unexpected result will interrupt execution with an error.
 
 ## Methodological limitations
 
-The dataset is synthetic, and the diagnostic indicators are determined by predefined rules. Consequently:
+Several methodological limitations should be considered when interpreting the project's results:
 
-- Symptom–diagnosis associations may partly reflect the classification rules used to generate the diagnoses.
-- The observed patterns do not establish diagnostic validity in real clinical populations.
-- A nonsignificant statistical test does not demonstrate the absence of a relationship.
-- The simplified classification rules should not be considered substitutes for comprehensive DSM-5 clinical assessment.
+- **Synthetic observations:** The dataset does not represent actual clinical participants. Statistical findings primarily reflect the structure and rules used to generate the data.
+- **Simplified diagnostic classification:** The implemented DSM-style rules differ from full clinical DSM-5 requirements in certain respects.
+- **Artificial symptom distributions:** Many symptom indicators occur in approximately half of the synthetic observations, which may not reflect real-world symptom frequencies.
+- **Binary symptom representation:** The variables do not adequately capture variation in severity, frequency, or functional impairment.
+- **Limited generalisability:** Associations and comorbidity patterns identified in the dataset cannot be generalised to psychiatric populations.
+- **Statistical interpretation:** Nonsignificant associations do not establish that symptoms or diagnoses are statistically independent.
+
+These limitations are discussed in greater detail in `main.Rmd`, alongside relevant academic literature.
 
 ## Data source and citation
 
-The dataset was obtained from Kaggle. The complete dataset title, original creator, URL, and retrieval details will be added after source verification.
+The project uses a synthetic mental health dataset obtained from Kaggle:
 
-To reference this project, include the repository name, contributors, year, and URL:
+Bakshi, K. (n.d.). *Mental illness dataset* [Data set]. Kaggle. https://www.kaggle.com/datasets/karanbakshi1/mental-illness-dataset
+
+The diagnostic framework is discussed in relation to:
+
+American Psychiatric Association. (2013). *Diagnostic and statistical manual of mental disorders* (5th ed.). https://doi.org/10.1176/appi.books.9780890425596
+
+The implemented diagnostic rules are simplified and do not fully reproduce the clinical diagnostic criteria described in the DSM-5. Additional academic references are provided in the main report.
+## Project contributors
+
+This project was developed by Tess, Sherilyn, and Misia for the *Programming in Psychological Science* course at the University of Amsterdam.
+
+The repository's Git commit history and pull requests document individual contributions to the data-processing functions, statistical analyses, Shiny application, integration, documentation, and independent testing.
+
+## Project repository
+
+The project's source code, documentation, and development history are available at:
 
 https://github.com/misia187/PIPS-group-project
-
-## Development status
-
-This project is under active development. The statistical analysis and diagnostic verification components have been implemented. The Shiny prototype is being extended, and documentation, integration, and independent testing are ongoing.
